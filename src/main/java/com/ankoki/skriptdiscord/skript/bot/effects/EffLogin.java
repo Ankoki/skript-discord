@@ -8,6 +8,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.util.Kleenean;
 import com.ankoki.skriptdiscord.api.BotBuilder;
 import com.ankoki.skriptdiscord.api.managers.BotManager;
@@ -23,32 +24,33 @@ import org.bukkit.event.Event;
         "\tallow intents:",
         "\t\tallow guild messages",
         "\t\tallow direct messages",
-        "login to last created bot"})
+        "\tlogin to this bot"})
 @Since("1.0")
 public class EffLogin extends Effect {
 
     static {
-        Skript.registerEffect(EffLogin.class, "login to [the] last [created] [discord] bot");
+        Skript.registerEffect(EffLogin.class, "login to ([the] last [created]|this) [discord] bot");
     }
 
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+        if (!ParserInstance.get().isCurrentSection(SecCreateBot.class)) {
+            Skript.error("You cannot use this outside of creating a bot!");
+            return false;
+        }
         return true;
     }
 
     @Override
     protected void execute(Event e) {
-        BotBuilder builder = SecCreateBot.finalBuilder;
-        if (builder == null) {
-            Skript.error("skript-discord | You cannot login to a bot without creating one!");
-        }
-        else if (builder.init()) {
+        BotBuilder builder = ((SecCreateBot) getParent()).getCurrentBuilder();
+        if (builder.init()) {
             BotManager.registerBot(builder.build());
         }
     }
 
     @Override
     public String toString(Event e, boolean debug) {
-        return "login to last bot";
+        return "login to this discord bot";
     }
 }

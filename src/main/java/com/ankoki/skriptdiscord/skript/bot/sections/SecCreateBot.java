@@ -31,7 +31,6 @@ public class SecCreateBot extends Section {
         Skript.registerSection(SecCreateBot.class, "(create|make|login [to]) [a] [new] bot");
     }
 
-    public static BotBuilder finalBuilder;
     private BotBuilder currentBuilder = new BotBuilder();
 
     @Override

@@ -29,7 +29,7 @@ import org.bukkit.event.Event;
 public class EffToken extends Effect {
 
     static {
-        Skript.registerEffect(EffName.class, "set [the] [bot[']s] [auth[entication]] token to %string%");
+        Skript.registerEffect(EffToken.class, "set [the] [bot[']s] [auth[entication]] token to %string%");
     }
 
     private Expression<String> tokenExpr;

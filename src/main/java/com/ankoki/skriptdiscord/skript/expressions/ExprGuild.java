@@ -11,6 +11,7 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
+import com.ankoki.skriptdiscord.api.DiscordBot;
 import com.ankoki.skriptdiscord.api.managers.BotManager;
 import net.dv8tion.jda.api.entities.Guild;
 import org.bukkit.event.Event;
@@ -42,12 +43,17 @@ public class ExprGuild extends SimpleExpression<Guild> {
         Object object = idExpr.getSingle(event);
         if (object == null) return new Guild[0];
         Delay.addDelayedEvent(event);
+        DiscordBot bot = BotManager.getFirstBot();
+        if (bot == null) {
+            Skript.error("There is no bot to complete this action.");
+            return new Guild[0];
+        }
         CompletableFuture<Guild> future = CompletableFuture.supplyAsync(() -> {
-            Guild guild = null;
+            Guild guild;
             if (object instanceof String) {
-                guild = BotManager.getFirstBot().getJda().getGuildById((String) object);
+                guild = bot.getJda().getGuildById((String) object);
             } else {
-                BotManager.getFirstBot().getJda().getGuildById((String) object);
+                guild = bot.getJda().getGuildById(((Number) object).longValue());
             }
             return guild;
         });

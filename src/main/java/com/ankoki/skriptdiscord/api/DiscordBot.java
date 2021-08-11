@@ -44,15 +44,16 @@ public class DiscordBot {
     public void sendMessage(MessageChannel channel, DiscordMessage message) {
         Bukkit.getScheduler().runTaskAsynchronously(SkriptDiscord.getInstance(), () -> {
             if (message.getType() == MessageType.TEXT) channel.sendMessage(message.getMessage()).queue();
-            else channel.sendMessage(message.getEmbed()).queue();
+            else channel.sendMessageEmbeds(message.getEmbed()).queue();
         });
     }
 
     public void sendMessage(User user, DiscordMessage message) {
+        System.out.println("sent");
         Bukkit.getScheduler().runTaskAsynchronously(SkriptDiscord.getInstance(), () -> {
             user.openPrivateChannel().queue(channel -> {
                 if (message.getType() == MessageType.TEXT) channel.sendMessage(message.getMessage()).queue();
-                else channel.sendMessage(message.getEmbed()).queue();
+                else channel.sendMessageEmbeds(message.getEmbed()).queue();
             });
         });
     }

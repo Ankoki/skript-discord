@@ -11,6 +11,8 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
+import com.ankoki.skriptdiscord.api.DiscordBot;
+import com.ankoki.skriptdiscord.api.managers.BotManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import org.bukkit.event.Event;
@@ -45,9 +47,14 @@ public class ExprUser extends SimpleExpression<User> {
         Object object = idExpr.getSingle(event);
         Guild guild = guildExpr.getSingle(event);
         if (guild == null || object == null) return new User[0];
+        DiscordBot bot = BotManager.getFirstBot();
+        if (bot == null) {
+            Skript.error("There is no bot to complete this action.");
+            return new User[0];
+        }
         Delay.addDelayedEvent(event);
         CompletableFuture<User> future = CompletableFuture.supplyAsync(() -> {
-            AtomicReference<User> user = null;
+            AtomicReference<User> user = new AtomicReference<>();
             if (object instanceof String) {
                  guild.retrieveMemberById((String) object).queue(member -> {
                      user.set(member.getUser());

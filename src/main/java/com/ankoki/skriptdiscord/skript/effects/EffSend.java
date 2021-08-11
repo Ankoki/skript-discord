@@ -24,7 +24,7 @@ import org.bukkit.event.Event;
 public class EffSend extends Effect {
 
     static {
-        Skript.registerEffect(EffSend.class, "(send|message) %discordmessages% to %discorduser/discordmember% [using %-discordbot%]");
+        Skript.registerEffect(EffSend.class, "(send|message) %discordmessages% to %discorduser/discordmember% [(using %-discordbot%|with discord)]");
     }
 
     private Expression<DiscordMessage> messageExpr;
@@ -46,7 +46,10 @@ public class EffSend extends Effect {
         DiscordBot bot = botExpr != null ? botExpr.getSingle(event) : BotManager.getFirstBot();
         if (message == null || receiver == null || bot == null) return;
         if (receiver instanceof MessageChannel) bot.sendMessage((MessageChannel) receiver, message);
-        else if (receiver instanceof Member) bot.sendMessage((Member) receiver, message);
+        else if (receiver instanceof Member) {
+            System.out.println("in member");
+            bot.sendMessage((Member) receiver, message);
+        }
         else bot.sendMessage((User) receiver, message);
     }
 
