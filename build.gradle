@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '5.1.0'
+    id 'eclipse'
+}
+
+build.dependsOn(shadowJar)
+jar.enabled = false
+
+group 'com.ankoki'
+version '1.0'
+
+repositories {
+    mavenCentral()
+    // Spigot
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    // Skript
+    maven { url 'https://jitpack.io/' }
+}
+
+dependencies {
+    compileOnly 'org.jetbrains:annotations:20.1.0'
+    compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
+    compileOnly ('com.github.APickledWalrus:Skript:b3e1314') {
+        transitive = false
+    }
+    implementation ('com.github.DV8FromTheWorld:JDA:196f31f') {
+        exclude module: 'opus-java'
+    }
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+shadowJar {
+    ant.replace(file: 'src/main/resources/plugin.yml', token: '@VERSION@', value: this.version)
+    relocate 'lombok', 'com.ankoki.skriptdiscord.libs.lombok'
+    relocate 'net.dv8tion.jda', 'com.ankoki.skriptdiscord.libs.jda'
+    archiveName 'skript-discord.jar'
+}
