@@ -14,6 +14,7 @@ import com.ankoki.skriptdiscord.utils.Console;
 import com.ankoki.skriptdiscord.utils.Utils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,7 +26,7 @@ public class SkriptDiscord extends JavaPlugin {
 
     private static SkriptDiscord instance;
     private SkriptAddon addon;
-    private final DecimalFormat sf = new DecimalFormat("0.00");
+    private static final DecimalFormat sf = new DecimalFormat("0.00");
 
     @Override
     public void onEnable() {
@@ -60,9 +61,6 @@ public class SkriptDiscord extends JavaPlugin {
                 .description("A DiscordMessage object.")
                 .since("1.0"));
 
-        Converters.registerConverter(DiscordMessage.class, String.class, DiscordMessage::getMessage);
-        Converters.registerConverter(String.class, DiscordMessage.class, DiscordMessage::new);
-
         Classes.registerClass(new ClassInfo<>(DiscordBot.class, "discordbot")
                 .user("discordbot?s?")
                 .name("Discord Bot")
@@ -81,12 +79,16 @@ public class SkriptDiscord extends JavaPlugin {
                 .description("A Member object.")
                 .since("1.0"));
 
-        Converters.registerConverter(Member.class, User.class, Member::getUser);
-
         Classes.registerClass(new ClassInfo<>(Guild.class, "discordguild")
                 .user("discordguild?s?")
                 .name("Discord Guild")
                 .description("A Guild object.")
+                .since("1.0"));
+
+        Classes.registerClass(new ClassInfo<>(MessageChannel.class, "discordchannel")
+                .user("discordchannel?s?")
+                .name("Discord Channel")
+                .description("A MessageChannel object.")
                 .since("1.0"));
 
         Classes.registerClass(new ClassInfo<>(GatewayIntent.class, "discordintent")
@@ -115,5 +117,11 @@ public class SkriptDiscord extends JavaPlugin {
                         return "[a-z ]+";
                     }
                 }));
+
+        Converters.registerConverter(DiscordMessage.class, String.class, DiscordMessage::getMessage);
+        // Below will not work until issue #4272 is addressed.
+        Converters.registerConverter(String.class, DiscordMessage.class, DiscordMessage::new);
+        Converters.registerConverter(DiscordBot.class, String.class, DiscordBot::toString);
+        Converters.registerConverter(Member.class, User.class, Member::getUser);
     }
 }

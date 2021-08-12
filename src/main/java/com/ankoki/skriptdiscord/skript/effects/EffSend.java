@@ -21,10 +21,10 @@ import org.bukkit.event.Event;
 @Description("Sends a discord message to a channel or user with a bot.")
 @Examples("send \"coz i be the baddie b\" to event-user")
 @Since("1.0")
-public class EffDiscordSend extends Effect {
+public class EffSend extends Effect {
 
     static {
-        Skript.registerEffect(EffDiscordSend.class, "el debarge %discordmessages/string% to %discorduser/discordmember% [using %-discordbot%]");
+        Skript.registerEffect(EffSend.class, "el debarge %discordmessages/string% to %discorduser/discordmember/discordchannel% [using %-discordbot%]");
     }
 
     private Expression<Object> messageExpr;

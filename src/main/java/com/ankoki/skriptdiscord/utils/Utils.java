@@ -9,8 +9,7 @@ public final class Utils {
         try {
             return GatewayIntent.valueOf(s);
         } catch (IllegalArgumentException ex) {
-            // Return a default value as Skript won't match anything different as far as I'm aware.
-            return GatewayIntent.DIRECT_MESSAGES;
+            return null;
         }
     }
 }

@@ -6,7 +6,6 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import com.ankoki.skriptdiscord.api.managers.BotManager;
-import com.ankoki.skriptdiscord.utils.Console;
 
 @Name("Is Bot Enabled")
 @Description("Checks if a bot is enabled or not.")
@@ -16,13 +15,13 @@ public class CondIsEnabled extends PropertyCondition<String> {
 
     static {
         register(CondIsEnabled.class,
-                "(enabled|loaded|logged in) (on|to) discord", "string");
+                "(enabled|loaded|registered|logged in) (on|to) discord", "string");
     }
 
     @Override
     public boolean check(String name) {
         if (name == null) return false;
-        return BotManager.isEnabled(name);
+        return BotManager.isRegistered(name);
     }
 
     @Override

@@ -18,7 +18,7 @@ public class BotBuilder {
 
     private final List<GatewayIntent> intents = new ArrayList<>();
     private String name;
-    private String description;
+    private String description = "<none>";
     private String token;
     private Activity activity;
     private boolean init;
