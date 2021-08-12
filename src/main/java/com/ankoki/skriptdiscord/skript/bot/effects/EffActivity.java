@@ -12,7 +12,6 @@ import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.util.Kleenean;
 import com.ankoki.skriptdiscord.api.BotBuilder;
 import com.ankoki.skriptdiscord.skript.bot.sections.SecCreateBot;
-import com.ankoki.skriptdiscord.utils.Utils;
 import net.dv8tion.jda.api.entities.Activity;
 import org.bukkit.event.Event;
 
@@ -30,7 +29,8 @@ import org.bukkit.event.Event;
 public class EffActivity extends Effect {
 
     static {
-        Skript.registerEffect(EffDescription.class, "set [the] [bot[']s] activity to (streaming|1¦watching|2¦playing|3¦listening|4¦competing) %string% [at %-string%]");
+        Skript.registerEffect(EffActivity.class,
+                "set [the] [bot[']s] activity to (streaming|1¦watching|2¦playing|3¦listening|4¦competing) %string% [at %-string%]");
     }
 
     private Expression<String> activityExpr;
@@ -44,7 +44,7 @@ public class EffActivity extends Effect {
             return false;
         }
         activityExpr = (Expression<String>) exprs[0];
-        if (exprs.length >= 2 && parseResult.mark != 0) {
+        if (exprs.length >= 2 && parseResult.mark == 0) {
             Skript.error("You cannot provide a streaming link unless you are using the streaming activity!");
             return false;
         }

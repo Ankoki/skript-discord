@@ -12,7 +12,6 @@ import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.util.Kleenean;
 import com.ankoki.skriptdiscord.api.BotBuilder;
 import com.ankoki.skriptdiscord.skript.bot.sections.SecCreateBot;
-import com.ankoki.skriptdiscord.utils.Utils;
 import org.bukkit.event.Event;
 
 @Name("Bots Name")
@@ -29,7 +28,8 @@ import org.bukkit.event.Event;
 public class EffName extends Effect {
 
     static {
-        Skript.registerEffect(EffName.class, "set [the] [bot[']s] (name|key|id) to %string%");
+        Skript.registerEffect(EffName.class,
+                "set [the] [bot[']s] (name|key|id) to %string%");
     }
 
     private Expression<String> nameExpr;

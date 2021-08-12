@@ -12,7 +12,6 @@ import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.util.Kleenean;
 import com.ankoki.skriptdiscord.api.BotBuilder;
 import com.ankoki.skriptdiscord.skript.bot.sections.SecCreateBot;
-import com.ankoki.skriptdiscord.utils.Utils;
 import org.bukkit.event.Event;
 
 @Name("Bots Token")
@@ -29,7 +28,8 @@ import org.bukkit.event.Event;
 public class EffToken extends Effect {
 
     static {
-        Skript.registerEffect(EffToken.class, "set [the] [bot[']s] [auth[entication]] token to %string%");
+        Skript.registerEffect(EffToken.class,
+                "set [the] [bot[']s] [auth[entication]] token to %string%");
     }
 
     private Expression<String> tokenExpr;

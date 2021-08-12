@@ -13,8 +13,6 @@ import ch.njol.util.Kleenean;
 import com.ankoki.skriptdiscord.api.BotBuilder;
 import com.ankoki.skriptdiscord.skript.bot.sections.SecCreateBot;
 import com.ankoki.skriptdiscord.skript.bot.sections.SecIntents;
-import com.ankoki.skriptdiscord.skript.embed.sections.SecEmbed;
-import com.ankoki.skriptdiscord.utils.Utils;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.bukkit.event.Event;
 
@@ -32,7 +30,8 @@ import org.bukkit.event.Event;
 public class EffAllowIntent extends Effect {
 
     static {
-        Skript.registerEffect(EffAllowIntent.class, "allow [the] intent %discordintent%");
+        Skript.registerEffect(EffAllowIntent.class,
+                "allow [the] intent %discordintent%");
     }
 
     private Expression<GatewayIntent> intentExpr;

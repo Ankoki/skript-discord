@@ -24,7 +24,8 @@ import java.util.List;
 public class SecEmbed extends Section {
 
     static {
-        Skript.registerSection(SecEmbed.class, "(create|make) [a[n]] [new] embed");
+        Skript.registerSection(SecEmbed.class,
+                "(create|make) [a[n]] [new] embed");
     }
 
     public static EmbedBuilder finalBuilder = new EmbedBuilder();

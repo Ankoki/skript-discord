@@ -11,7 +11,6 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.util.Kleenean;
 import com.ankoki.skriptdiscord.skript.embed.sections.SecEmbed;
-import com.ankoki.skriptdiscord.utils.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.bukkit.event.Event;
@@ -24,7 +23,8 @@ import org.bukkit.event.Event;
 public class EffDescription extends Effect {
 
     static {
-        Skript.registerEffect(EffTitle.class, "set [the] [embed[']s] description to %strings%");
+        Skript.registerEffect(EffDescription.class,
+                "set [the] [embed[']s] description to %strings%");
     }
 
     private Expression<String> descriptionExpr;

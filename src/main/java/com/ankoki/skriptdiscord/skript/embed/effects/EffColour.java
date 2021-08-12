@@ -9,10 +9,8 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.parser.ParserInstance;
-import ch.njol.skript.util.SkriptColor;
 import ch.njol.util.Kleenean;
 import com.ankoki.skriptdiscord.skript.embed.sections.SecEmbed;
-import com.ankoki.skriptdiscord.utils.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.bukkit.event.Event;
 
@@ -26,7 +24,8 @@ import java.awt.*;
 public class EffColour extends Effect {
 
     static {
-        Skript.registerEffect(EffColour.class, "set [the] [embed[']s] colo[u]r to [rgb[ ][(]]%number%, %number%, %number%[)]");
+        Skript.registerEffect(EffColour.class,
+                "set [the] [embed[']s] colo[u]r to [rgb[ ][(]]%number%, %number%, %number%[)]");
     }
 
     private Expression<Number> redExpr;

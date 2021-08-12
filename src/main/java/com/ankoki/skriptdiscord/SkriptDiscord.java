@@ -9,6 +9,8 @@ import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Converters;
 import com.ankoki.skriptdiscord.api.DiscordBot;
 import com.ankoki.skriptdiscord.api.DiscordMessage;
+import com.ankoki.skriptdiscord.api.managers.BotManager;
+import com.ankoki.skriptdiscord.utils.Console;
 import com.ankoki.skriptdiscord.utils.Utils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -17,14 +19,17 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 public class SkriptDiscord extends JavaPlugin {
 
     private static SkriptDiscord instance;
     private SkriptAddon addon;
+    private final DecimalFormat sf = new DecimalFormat("0.00");
 
     @Override
     public void onEnable() {
+        long start = System.currentTimeMillis();
         instance = this;
         addon = Skript.registerAddon(this);
         registerClassInfo();
@@ -33,12 +38,15 @@ public class SkriptDiscord extends JavaPlugin {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        long fin = System.currentTimeMillis() - start;
+        Console.log("Successfully enabled in " + sf.format(fin) + " seconds (" + fin + "ms)");
     }
 
     @Override
     public void onDisable() {
         instance = null;
         addon = null;
+        BotManager.disableAll();
     }
 
     public static SkriptDiscord getInstance() {

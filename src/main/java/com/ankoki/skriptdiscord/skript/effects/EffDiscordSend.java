@@ -21,19 +21,19 @@ import org.bukkit.event.Event;
 @Description("Sends a discord message to a channel or user with a bot.")
 @Examples("send \"coz i be the baddie b\" to event-user")
 @Since("1.0")
-public class EffSend extends Effect {
+public class EffDiscordSend extends Effect {
 
     static {
-        Skript.registerEffect(EffSend.class, "(send|message) %discordmessages% to %discorduser/discordmember% [(using %-discordbot%|with discord)]");
+        Skript.registerEffect(EffDiscordSend.class, "el debarge %discordmessages/string% to %discorduser/discordmember% [using %-discordbot%]");
     }
 
-    private Expression<DiscordMessage> messageExpr;
+    private Expression<Object> messageExpr;
     private Expression<Object> receiverExpr;
     private Expression<DiscordBot> botExpr;
 
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-        messageExpr = (Expression<DiscordMessage>) exprs[0];
+        messageExpr = (Expression<Object>) exprs[0];
         receiverExpr = (Expression<Object>) exprs[1];
         botExpr = exprs.length == 3 ? (Expression<DiscordBot>) exprs[2] : null;
         return true;
@@ -41,20 +41,20 @@ public class EffSend extends Effect {
 
     @Override
     protected void execute(Event event) {
-        DiscordMessage message = messageExpr.getSingle(event);
+        Object message = messageExpr.getSingle(event);
         Object receiver = receiverExpr.getSingle(event);
         DiscordBot bot = botExpr != null ? botExpr.getSingle(event) : BotManager.getFirstBot();
         if (message == null || receiver == null || bot == null) return;
-        if (receiver instanceof MessageChannel) bot.sendMessage((MessageChannel) receiver, message);
-        else if (receiver instanceof Member) {
-            System.out.println("in member");
-            bot.sendMessage((Member) receiver, message);
-        }
-        else bot.sendMessage((User) receiver, message);
+        if (receiver instanceof MessageChannel) bot.sendMessage((MessageChannel) receiver, message instanceof String ?
+                new DiscordMessage((String) message) : (DiscordMessage) message);
+        else if (receiver instanceof Member) bot.sendMessage((Member) receiver, message instanceof String ?
+                new DiscordMessage((String) message) : (DiscordMessage) message);
+        else bot.sendMessage((User) receiver, message instanceof String ?
+                    new DiscordMessage((String) message) : (DiscordMessage) message);
     }
 
     @Override
     public String toString(Event e, boolean debug) {
-        return "send " + messageExpr.toString(e, debug) + " to " + receiverExpr.toString(e, debug);
+        return "send " + messageExpr.toString(e, debug) + " to " + receiverExpr.toString(e, debug) + " with discord";
     }
 }

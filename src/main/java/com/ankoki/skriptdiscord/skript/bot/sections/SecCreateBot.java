@@ -10,7 +10,6 @@ import ch.njol.skript.lang.*;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import com.ankoki.skriptdiscord.api.BotBuilder;
-import com.ankoki.skriptdiscord.api.managers.BotManager;
 import org.bukkit.event.Event;
 
 import java.util.List;
@@ -28,7 +27,8 @@ import java.util.List;
 public class SecCreateBot extends Section {
 
     static {
-        Skript.registerSection(SecCreateBot.class, "(create|make|login [to]) [a] [new] bot");
+        Skript.registerSection(SecCreateBot.class,
+                "(create|make|login [to]) [a] [new] bot");
     }
 
     private BotBuilder currentBuilder = new BotBuilder();

@@ -49,7 +49,6 @@ public class DiscordBot {
     }
 
     public void sendMessage(User user, DiscordMessage message) {
-        System.out.println("sent");
         Bukkit.getScheduler().runTaskAsynchronously(SkriptDiscord.getInstance(), () -> {
             user.openPrivateChannel().queue(channel -> {
                 if (message.getType() == MessageType.TEXT) channel.sendMessage(message.getMessage()).queue();

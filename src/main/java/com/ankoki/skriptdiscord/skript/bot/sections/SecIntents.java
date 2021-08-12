@@ -13,9 +13,6 @@ import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.util.Kleenean;
 import com.ankoki.skriptdiscord.api.BotBuilder;
-import com.ankoki.skriptdiscord.skript.embed.sections.SecEmbed;
-import com.ankoki.skriptdiscord.utils.Utils;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.bukkit.event.Event;
 
@@ -34,7 +31,8 @@ import java.util.List;
 public class SecIntents extends EffectSection {
 
     static {
-        Skript.registerSection(SecIntents.class, "allow (1¦all|) intents");
+        Skript.registerSection(SecIntents.class,
+                "allow (1¦all|) intents");
     }
 
     @Override
