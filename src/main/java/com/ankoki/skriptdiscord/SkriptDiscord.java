@@ -7,9 +7,9 @@ import ch.njol.skript.classes.Parser;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.Converters;
-import com.ankoki.skriptdiscord.api.DiscordBot;
+import com.ankoki.skriptdiscord.api.bot.DiscordBot;
 import com.ankoki.skriptdiscord.api.DiscordMessage;
-import com.ankoki.skriptdiscord.api.managers.BotManager;
+import com.ankoki.skriptdiscord.api.bot.BotManager;
 import com.ankoki.skriptdiscord.utils.Console;
 import com.ankoki.skriptdiscord.utils.Utils;
 import net.dv8tion.jda.api.entities.Guild;
@@ -99,7 +99,7 @@ public class SkriptDiscord extends JavaPlugin {
                 .parser(new Parser<GatewayIntent>() {
                     @Override
                     public GatewayIntent parse(String s, ParseContext context) {
-                        return Utils.getGatewaySafely(s);
+                        return Utils.getGatewaySafely(s.replace(" ", "_").toUpperCase());
                     }
 
                     @Override

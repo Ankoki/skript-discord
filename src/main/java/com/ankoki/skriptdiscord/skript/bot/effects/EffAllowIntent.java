@@ -10,7 +10,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.util.Kleenean;
-import com.ankoki.skriptdiscord.api.BotBuilder;
+import com.ankoki.skriptdiscord.api.bot.BotBuilder;
 import com.ankoki.skriptdiscord.skript.bot.sections.SecCreateBot;
 import com.ankoki.skriptdiscord.skript.bot.sections.SecIntents;
 import net.dv8tion.jda.api.requests.GatewayIntent;

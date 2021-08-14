@@ -9,7 +9,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.*;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
-import com.ankoki.skriptdiscord.api.BotBuilder;
+import com.ankoki.skriptdiscord.api.bot.BotBuilder;
 import org.bukkit.event.Event;
 
 import java.util.List;

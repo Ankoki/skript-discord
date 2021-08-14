@@ -9,8 +9,8 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
-import com.ankoki.skriptdiscord.api.DiscordBot;
-import com.ankoki.skriptdiscord.api.managers.BotManager;
+import com.ankoki.skriptdiscord.api.bot.DiscordBot;
+import com.ankoki.skriptdiscord.api.bot.BotManager;
 import org.bukkit.event.Event;
 
 @Name("Shutdown Bot")

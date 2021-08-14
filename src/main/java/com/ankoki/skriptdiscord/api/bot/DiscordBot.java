@@ -1,7 +1,9 @@
-package com.ankoki.skriptdiscord.api;
+package com.ankoki.skriptdiscord.api.bot;
 
 import ch.njol.skript.Skript;
 import com.ankoki.skriptdiscord.SkriptDiscord;
+import com.ankoki.skriptdiscord.api.DiscordMessage;
+import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -13,34 +15,32 @@ import org.bukkit.Bukkit;
 
 public class DiscordBot {
 
+    @Getter
     private final JDA jda;
+    @Getter
     private final String name;
+    @Getter
     private final String description;
+    @Getter
+    private final String prefix;
 
-    public DiscordBot(String name, String description, JDA jda) {
+    public DiscordBot(String name, String description, JDA jda, String prefix) {
         this.name = name;
         this.description = description;
         this.jda = jda;
+        this.prefix = prefix;
+    }
+
+    public DiscordBot(String name, String description, JDA jda) {
+        this(name, description, jda, null);
     }
 
     public DiscordBot(BotBuilder builder) {
-        this(builder.getName(), builder.getDescription(), builder.getJda());
+        this(builder.getName(), builder.getDescription(), builder.getJda(), null);
     }
 
     public DiscordBot(String name, JDA jda) {
-        this(name, "<none>", jda);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public JDA getJda() {
-        return jda;
+        this(name, "<none>", jda, null);
     }
 
     public boolean hasIntent(GatewayIntent intent) {

@@ -1,6 +1,8 @@
-package com.ankoki.skriptdiscord.api;
+package com.ankoki.skriptdiscord.api.bot;
 
 import ch.njol.skript.Skript;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -16,50 +18,26 @@ import java.util.concurrent.ExecutionException;
 
 public class BotBuilder {
 
+    @Getter
     private final List<GatewayIntent> intents = new ArrayList<>();
+    @Getter
+    @Setter
     private String name;
+    @Getter
+    @Setter
     private String description = "<none>";
+    @Getter
+    @Setter
     private String token;
+    @Getter
+    @Setter
+    private String prefix;
+    @Getter
+    @Setter
     private Activity activity;
+
     private boolean init;
-
     private JDA jda;
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setActivity(Activity activity) {
-        this.activity = activity;
-    }
-
-    public Activity getActivity() {
-        return activity;
-    }
-
-    public JDA getJda() {
-        return jda;
-    }
 
     public void allowIntent(GatewayIntent... intents) {
         Collections.addAll(this.intents, intents);

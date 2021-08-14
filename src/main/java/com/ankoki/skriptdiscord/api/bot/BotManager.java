@@ -1,8 +1,8 @@
-package com.ankoki.skriptdiscord.api.managers;
+package com.ankoki.skriptdiscord.api.bot;
 
 import ch.njol.skript.Skript;
-import com.ankoki.skriptdiscord.api.DiscordBot;
 import com.ankoki.skriptdiscord.utils.Console;
+import net.dv8tion.jda.api.JDA;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,6 +44,21 @@ public class BotManager {
      */
     public static DiscordBot getBot(String name) {
         return DISCORD_BOT_MAP.get(name);
+    }
+
+    /**
+     * Gets a discord bot from the JDA.
+     *
+     * @param jda jda of the bot wanted.
+     * @return the bot with said JDA, if it's not a registered bot, null.
+     */
+    public static DiscordBot getBot(JDA jda) {
+        for (Map.Entry<String, DiscordBot> entry : DISCORD_BOT_MAP.entrySet()) {
+            if (jda == entry.getValue().getJda()) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 
     /**

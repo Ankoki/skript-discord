@@ -5,7 +5,7 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import com.ankoki.skriptdiscord.api.managers.BotManager;
+import com.ankoki.skriptdiscord.api.bot.BotManager;
 
 @Name("Is Bot Enabled")
 @Description("Checks if a bot is enabled or not.")

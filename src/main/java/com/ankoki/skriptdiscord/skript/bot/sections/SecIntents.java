@@ -12,7 +12,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.util.Kleenean;
-import com.ankoki.skriptdiscord.api.BotBuilder;
+import com.ankoki.skriptdiscord.api.bot.BotBuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.bukkit.event.Event;
 
