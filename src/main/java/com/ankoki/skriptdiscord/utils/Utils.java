@@ -1,6 +1,8 @@
 package com.ankoki.skriptdiscord.utils;
 
+import com.ankoki.skriptdiscord.SkriptDiscord;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import org.bukkit.Bukkit;
 
 public final class Utils {
     private Utils(){}
@@ -20,6 +22,14 @@ public final class Utils {
 
     public static String[] getCommandArguments(String command) {
         String[] splitCommand = command.split(" ");
-        return (command.substring(0, (splitCommand[0] + " ").length())).split(" ");
+        try {
+            return (command.substring(0, (splitCommand[0] + " ").length())).split(" ");
+        } catch (IndexOutOfBoundsException ex) {
+            return (command.substring(0, (splitCommand[0] + " ").length() - 1)).split(" ");
+        }
+    }
+
+    public static void runSync(Runnable runnable) {
+        Bukkit.getScheduler().runTask(SkriptDiscord.getInstance(), runnable);
     }
 }

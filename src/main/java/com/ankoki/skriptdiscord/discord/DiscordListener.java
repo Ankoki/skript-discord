@@ -1,7 +1,5 @@
 package com.ankoki.skriptdiscord.discord;
 
-import com.ankoki.skriptdiscord.api.bot.BotManager;
-import com.ankoki.skriptdiscord.api.bot.DiscordBot;
 import com.ankoki.skriptdiscord.skript.commands.BukkitDiscordCommandEvent;
 import com.ankoki.skriptdiscord.skript.commands.DiscordCommand;
 import com.ankoki.skriptdiscord.utils.Utils;
@@ -14,12 +12,11 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
-        DiscordBot bot = BotManager.getBot(event.getJDA());
-        if (bot != null && bot.getPrefix() != null) {
-            String message = event.getMessage().getContentRaw();
-            String alias = Utils.getCommandName(message, bot.getPrefix());
-            DiscordCommand command = new DiscordCommand(event.getMember(), bot.getPrefix(), message, alias, Utils.getCommandArguments(message));
-            Bukkit.getPluginManager().callEvent(new BukkitDiscordCommandEvent(command));
+        if (event.getAuthor().isBot()) return;
+        String message = event.getMessage().getContentRaw();
+        if (!message.isEmpty()) {
+            DiscordCommand command = new DiscordCommand(event.getMember(), event.getChannel(), message, (message.split(" ")[0]), Utils.getCommandArguments(message));
+            Utils.runSync(() -> Bukkit.getPluginManager().callEvent(new BukkitDiscordCommandEvent(command)));
         }
         // TODO fire `on discord message` and `on discord guild message`
     }

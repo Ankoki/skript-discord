@@ -1,6 +1,7 @@
 package com.ankoki.skriptdiscord.api.bot;
 
 import ch.njol.skript.Skript;
+import com.ankoki.skriptdiscord.discord.DiscordListener;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -37,6 +38,7 @@ public class BotBuilder {
     private Activity activity;
 
     private boolean init;
+    @Getter
     private JDA jda;
 
     public void allowIntent(GatewayIntent... intents) {
@@ -53,7 +55,7 @@ public class BotBuilder {
                 jda = JDABuilder.createDefault(token).build();
                 jda.awaitReady();
                 JDABuilder.createLight(token, intents)
-                        .addEventListeners() // TODO add listeners when applicable.
+                        .addEventListeners(new DiscordListener())
                         .setActivity(activity)
                         .build();
             } catch (LoginException | InterruptedException ex) {

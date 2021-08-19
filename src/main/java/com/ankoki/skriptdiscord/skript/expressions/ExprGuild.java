@@ -61,8 +61,8 @@ public class ExprGuild extends SimpleExpression<Guild> {
         try {
             return new Guild[]{future.get()};
         } catch (InterruptedException | ExecutionException ex) {
-            ex.printStackTrace();
             Skript.error("Something went horrifically wrong retrieving this guild!");
+            ex.printStackTrace();
         }
         return new Guild[0];
     }
