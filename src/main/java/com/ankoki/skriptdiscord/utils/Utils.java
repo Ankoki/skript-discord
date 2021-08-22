@@ -4,6 +4,9 @@ import com.ankoki.skriptdiscord.SkriptDiscord;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.bukkit.Bukkit;
 
+import java.util.Arrays;
+import java.util.List;
+
 public final class Utils {
     private Utils(){}
 
@@ -21,12 +24,9 @@ public final class Utils {
     }
 
     public static String[] getCommandArguments(String command) {
+        if (command.isEmpty()) return new String[0];
         String[] splitCommand = command.split(" ");
-        try {
-            return (command.substring(0, (splitCommand[0] + " ").length())).split(" ");
-        } catch (IndexOutOfBoundsException ex) {
-            return (command.substring(0, (splitCommand[0] + " ").length() - 1)).split(" ");
-        }
+        return Arrays.copyOfRange(splitCommand, 1, splitCommand.length);
     }
 
     public static void runSync(Runnable runnable) {

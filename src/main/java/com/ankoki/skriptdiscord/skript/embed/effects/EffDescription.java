@@ -41,7 +41,8 @@ public class EffDescription extends Effect {
 
     @Override
     protected void execute(Event event) {
-        String description = descriptionExpr.getSingle(event);
+        String[] descriptionArray = descriptionExpr.getArray(event);
+        String description = String.join(" ", descriptionArray);
         if (description == null || description.length() > MessageEmbed.DESCRIPTION_MAX_LENGTH) return;
         EmbedBuilder builder = ((SecEmbed) getParent()).getCurrentBuilder();
         builder.setDescription(description);

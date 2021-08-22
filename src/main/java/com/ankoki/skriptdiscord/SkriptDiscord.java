@@ -22,6 +22,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
+// TODO [01:19:25 WARN]: Exception in thread "JDA Shutdown Hook" java.lang.NoClassDefFoundError: com/ankoki/skriptdiscord/libs/jda/internal/managers/AudioManagerImpl
+// Include audio shit
 public class SkriptDiscord extends JavaPlugin {
 
     private static SkriptDiscord instance;
@@ -123,5 +125,7 @@ public class SkriptDiscord extends JavaPlugin {
         Converters.registerConverter(String.class, DiscordMessage.class, DiscordMessage::new);
         Converters.registerConverter(DiscordBot.class, String.class, DiscordBot::toString);
         Converters.registerConverter(Member.class, User.class, Member::getUser);
+        Converters.registerConverter(Member.class, String.class, Member::getEffectiveName);
+        Converters.registerConverter(User.class, String.class, User::getName);
     }
 }

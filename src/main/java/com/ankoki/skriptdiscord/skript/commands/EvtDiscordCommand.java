@@ -3,7 +3,6 @@ package com.ankoki.skriptdiscord.skript.commands;
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.ClassInfo;
-import ch.njol.skript.command.Argument;
 import ch.njol.skript.config.EntryNode;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
@@ -42,13 +41,11 @@ import java.util.regex.Pattern;
         "\ttrigger:",
         "\t\tsend arg-1 to event-channel using event-bot"})
 @Since("1.0")
-public class EvtDiscordEvent extends SkriptEvent {
+public class EvtDiscordCommand extends SkriptEvent {
 
     static {
-        Skript.registerEvent("Discord Command", EvtDiscordEvent.class, BukkitDiscordCommandEvent.class,
+        Skript.registerEvent("Discord Command", EvtDiscordCommand.class, BukkitDiscordCommandEvent.class,
                 "discord command <([^\\s]+)( .+)?$>");
-
-        // TODO set arguments, not sure how i'm going to be able to set the arguments as Skript doesn't do it like this -.-
 
         EventValues.registerEventValue(BukkitDiscordCommandEvent.class, Member.class, new Getter<Member, BukkitDiscordCommandEvent>() {
             @Override
@@ -88,6 +85,8 @@ public class EvtDiscordEvent extends SkriptEvent {
             .addEntry("prefixes", false)
             .addSection("trigger", false);
 
+    public static List<Argument<?>> lastArguments = new ArrayList<>();
+
     private String commandName;
     private String unparsedArguments;
     private final List<Argument<?>> currentArguments = new ArrayList<>();
@@ -95,6 +94,7 @@ public class EvtDiscordEvent extends SkriptEvent {
     // TODO all the entries such as description etc
     private final List<String> aliases = new ArrayList<>();
     private Trigger trigger;
+    private String argumentSkriptPattern;
 
     private static String escape(final String s) {
         return escape.matcher(s).replaceAll("\\\\$0");
@@ -160,8 +160,8 @@ public class EvtDiscordEvent extends SkriptEvent {
                 lastEnd = matcher.end();
 
                 ClassInfo<?> classInfo;
-                classInfo = Classes.getClassInfoFromUserInput("" + matcher.group(2));
-                NonNullPair<String, Boolean> pair = Utils.getEnglishPlural("" + matcher.group(2));
+                classInfo = Classes.getClassInfoFromUserInput(matcher.group(2));
+                NonNullPair<String, Boolean> pair = Utils.getEnglishPlural(matcher.group(2));
                 if (classInfo == null)
                     classInfo = Classes.getClassInfoFromUserInput(pair.getFirst());
                 if (classInfo == null) {
@@ -183,7 +183,11 @@ public class EvtDiscordEvent extends SkriptEvent {
                     optionals--;
                 }
             }
+            argumentSkriptPattern = pattern.toString();
         }
+
+        ParserInstance.get().setCurrentEvent("discord command", BukkitDiscordCommandEvent.class);
+        lastArguments = currentArguments;
 
         SectionNode triggerNode = (SectionNode) node.get("trigger");
         if (triggerNode == null) return false;
@@ -209,7 +213,7 @@ public class EvtDiscordEvent extends SkriptEvent {
         for (Node subNode : tempNodes) {
             node.remove(subNode);
         }
-        ParserInstance.get().setCurrentEvent("discord command", BukkitDiscordCommandEvent.class);
+
         return true;
     }
 
@@ -218,7 +222,19 @@ public class EvtDiscordEvent extends SkriptEvent {
         BukkitDiscordCommandEvent event = (BukkitDiscordCommandEvent) e;
         DiscordCommand command = event.getCommand();
         if (commandMatches(command.getUsedAlias())) {
-            // TODO check if arguments match and shit blah blah idk how imma do that </3
+            ParseResult result = SkriptParser.parse(String.join(" ", command.getUnparsedArguments()), argumentSkriptPattern);
+            if (result == null) return false;
+            Expression<?>[] exprs = result.exprs;
+            if (exprs.length != currentArguments.size()) return false;
+            int i = 0;
+            for (Argument<?> argument : currentArguments) {
+                if (exprs[i] == null) {
+                    argument.setToDefault(event);
+                } else {
+                    argument.set(event, exprs[i].getArray(event));
+                }
+                i++;
+            }
             trigger.execute(event);
             return true;
         }
