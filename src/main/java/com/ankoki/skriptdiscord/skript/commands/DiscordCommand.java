@@ -13,6 +13,8 @@ public class DiscordCommand {
     @Getter
     private final MessageChannel channel;
     @Getter
+    private final boolean inGuild;
+    @Getter
     private final String fullCommand;
     @Getter
     private final String usedAlias;

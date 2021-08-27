@@ -18,17 +18,15 @@ import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Getter;
+import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.StringUtils;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.*;
 import org.bukkit.event.Event;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,7 +37,7 @@ import java.util.regex.Pattern;
         "\taliases: echo",
         "\tdescription: Repeats the text that was sent.",
         "\ttrigger:",
-        "\t\tsend arg-1 to event-channel using event-bot"})
+        "\t\tsend arg-1 to event-channel"})
 @Since("1.0")
 public class EvtDiscordCommand extends SkriptEvent {
 
@@ -76,23 +74,30 @@ public class EvtDiscordCommand extends SkriptEvent {
             .addEntry("aliases", true)
             .addEntry("description", true)
             .addEntry("roles", true)
-            .addEntry("bots", true)
+            .addEntry("bots", true) // TODO not sure how to do this, multiple bots confuse me
             .addEntry("executable in", true)
             .addEntry("permissions", true)
             .addEntry("permission message", true)
-            .addEntry("guild cooldown", true)
+            .addEntry("cooldown", true)
             .addEntry("cooldown message", true)
             .addEntry("prefixes", false)
             .addSection("trigger", false);
-
     public static List<Argument<?>> lastArguments = new ArrayList<>();
+    private static final Map<String, Long> commandCooldowns = new HashMap<>();
 
     private String commandName;
     private String unparsedArguments;
     private final List<Argument<?>> currentArguments = new ArrayList<>();
-    private final List<String> prefixes = new ArrayList<>();
-    // TODO all the entries such as description etc
+
     private final List<String> aliases = new ArrayList<>();
+    private String description;
+    private final List<String> executableIn = new ArrayList<>();
+    private final List<String> roles = new ArrayList<>();
+    private final List<Permission> permissions = new ArrayList<>();
+    private String permissionMessage;
+    private Expression<Timespan> cooldownExpr;
+    private String cooldownMessage;
+    private final List<String> prefixes = new ArrayList<>();
     private Trigger trigger;
     private String argumentSkriptPattern;
 
@@ -114,6 +119,43 @@ public class EvtDiscordCommand extends SkriptEvent {
             Skript.error("The prefixes cannot be a section!");
             return false;
         }
+
+        String rawAliases = ScriptLoader.replaceOptions(node.get("aliases", ""));
+        if (!rawAliases.equals("")) {
+            Collections.addAll(aliases, rawAliases.split(listPattern));
+        }
+        aliases.add(commandName);
+
+        description = ScriptLoader.replaceOptions(node.get("description", ""));
+
+        String rawRoles = ScriptLoader.replaceOptions(node.get("roles", ""));
+        Collections.addAll(roles, rawRoles.split(listPattern));
+
+        String rawExecutable = ScriptLoader.replaceOptions(node.get("executable in", "guild and dm"));
+        Collections.addAll(executableIn, rawExecutable.split(listPattern));
+
+        String rawPermissions = ScriptLoader.replaceOptions(node.get("permission", ""));
+        for (String perm : rawPermissions.split(listPattern)) {
+            try {
+                Permission permission = Permission.valueOf(perm.toUpperCase().replace(" ", "_"));
+                permissions.add(permission);
+            } catch (IllegalArgumentException ex) {
+                Skript.error("'" + perm + "' is not a valid permission!");
+                return false;
+            }
+        }
+
+        permissionMessage = ScriptLoader.replaceOptions(node.get("permission message", ""));
+
+        String rawCooldown = ScriptLoader.replaceOptions(node.get("cooldown", ""));
+        ParseResult result = SkriptParser.parse(rawCooldown, "%timespan%");
+        if (result == null) cooldownExpr = null;
+        else {
+            if (result.exprs.length < 1) cooldownExpr = null;
+            else cooldownExpr = (Expression<Timespan>) result.exprs[0];
+        }
+
+        cooldownMessage = ScriptLoader.replaceOptions(node.get("cooldown message", ""));
 
         String rawPrefixes = ScriptLoader.replaceOptions(node.get("prefixes", ""));
         Collections.addAll(prefixes, rawPrefixes.split(listPattern));
@@ -139,13 +181,6 @@ public class EvtDiscordCommand extends SkriptEvent {
             Skript.error("You cannot open optional brackets without closing them!");
             return false;
         }
-
-        String rawAliases = ScriptLoader.replaceOptions(node.get("aliases", ""));
-        if (!rawAliases.equals("")) {
-            Collections.addAll(aliases, rawAliases.split(listPattern));
-        }
-
-        aliases.add(commandName);
 
         if (unparsedArguments != null) {
             StringBuilder pattern = new StringBuilder();
@@ -222,6 +257,41 @@ public class EvtDiscordCommand extends SkriptEvent {
         BukkitDiscordCommandEvent event = (BukkitDiscordCommandEvent) e;
         DiscordCommand command = event.getCommand();
         if (commandMatches(command.getUsedAlias())) {
+            Member member = command.getMember();
+            Guild guild = member.getGuild();
+            boolean hasRole = false;
+            for (String roleName : roles) {
+                List<Role> guildRolesByName = guild.getRolesByName(roleName, false);
+                for (Role role : guildRolesByName) {
+                    if (member.getRoles().contains(role)) {
+                        hasRole = true;
+                        break;
+                    }
+                }
+                if (hasRole) break;
+            }
+            if (!hasRole) return false;
+            if (!command.isInGuild() && !executableIn.contains("guild")) return false;
+            if (member.hasPermission(permissions)) {
+                if (!permissionMessage.isEmpty()) {
+                    command.getChannel().sendMessage(permissionMessage).queue();
+                }
+                return false;
+            }
+            if (cooldownExpr != null) {
+                Timespan cooldown = cooldownExpr.getSingle(event);
+                if (cooldown != null) {
+                    long millis = cooldown.getMilliSeconds();
+                    if (commandCooldowns.containsKey(commandName)) {
+                        long lastExecuted = commandCooldowns.get(commandName);
+                        if (System.currentTimeMillis() - millis < lastExecuted) {
+                            if (!cooldownMessage.isEmpty()) command.getChannel().sendMessage(cooldownMessage).queue();
+                            return false;
+                        }
+                    }
+                    commandCooldowns.put(commandName, System.currentTimeMillis());
+                }
+            }
             ParseResult result = SkriptParser.parse(String.join(" ", command.getUnparsedArguments()), argumentSkriptPattern);
             if (result == null) return false;
             Expression<?>[] exprs = result.exprs;

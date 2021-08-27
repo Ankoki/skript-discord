@@ -15,7 +15,7 @@ public class DiscordListener extends ListenerAdapter {
         if (event.getAuthor().isBot()) return;
         String message = event.getMessage().getContentRaw();
         if (!message.isEmpty()) {
-            DiscordCommand command = new DiscordCommand(event.getMember(), event.getChannel(), message, (message.split(" ")[0]), Utils.getCommandArguments(message));
+            DiscordCommand command = new DiscordCommand(event.getMember(), event.getChannel(), true, message, (message.split(" ")[0]), Utils.getCommandArguments(message));
             Utils.runSync(() -> Bukkit.getPluginManager().callEvent(new BukkitDiscordCommandEvent(command)));
         }
         // TODO fire `on discord message` and `on discord guild message`
