@@ -1,5 +1,6 @@
 package com.ankoki.skriptdiscord.discord;
 
+import com.ankoki.skriptdiscord.api.bot.BotManager;
 import com.ankoki.skriptdiscord.skript.commands.BukkitDiscordCommandEvent;
 import com.ankoki.skriptdiscord.skript.commands.DiscordCommand;
 import com.ankoki.skriptdiscord.utils.Utils;
@@ -15,7 +16,7 @@ public class DiscordListener extends ListenerAdapter {
         if (event.getAuthor().isBot()) return;
         String message = event.getMessage().getContentRaw();
         if (!message.isEmpty()) {
-            DiscordCommand command = new DiscordCommand(event.getMember(), event.getChannel(), true, message, (message.split(" ")[0]), Utils.getCommandArguments(message));
+            DiscordCommand command = new DiscordCommand(event.getMember(), BotManager.getBot(event.getJDA()), event.getChannel(), true, message, (message.split(" ")[0]), Utils.getCommandArguments(message));
             Utils.runSync(() -> Bukkit.getPluginManager().callEvent(new BukkitDiscordCommandEvent(command)));
         }
         // TODO fire `on discord message` and `on discord guild message`

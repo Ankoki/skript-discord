@@ -1,15 +1,19 @@
 package com.ankoki.skriptdiscord.skript.commands;
 
+import com.ankoki.skriptdiscord.api.bot.DiscordBot;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 
 @RequiredArgsConstructor
 public class DiscordCommand {
 
     @Getter
-    private final Member member;
+    private final Object executor;
+    @Getter
+    private final DiscordBot bot;
     @Getter
     private final MessageChannel channel;
     @Getter

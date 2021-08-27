@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.bukkit.Bukkit;
 
 import java.util.Arrays;
-import java.util.List;
 
 public final class Utils {
     private Utils(){}
@@ -31,5 +30,9 @@ public final class Utils {
 
     public static void runSync(Runnable runnable) {
         Bukkit.getScheduler().runTask(SkriptDiscord.getInstance(), runnable);
+    }
+
+    public static void runAsync(Runnable runnable) {
+        Bukkit.getScheduler().runTaskAsynchronously(SkriptDiscord.getInstance(), runnable);
     }
 }

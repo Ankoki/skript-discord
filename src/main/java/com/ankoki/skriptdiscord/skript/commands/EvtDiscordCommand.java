@@ -22,6 +22,7 @@ import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.NonNullPair;
 import ch.njol.util.StringUtils;
+import com.ankoki.skriptdiscord.api.bot.DiscordBot;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import org.bukkit.event.Event;
@@ -48,14 +49,18 @@ public class EvtDiscordCommand extends SkriptEvent {
         EventValues.registerEventValue(BukkitDiscordCommandEvent.class, Member.class, new Getter<Member, BukkitDiscordCommandEvent>() {
             @Override
             public Member get(BukkitDiscordCommandEvent event) {
-                return event.getCommand().getMember();
+                Object obj = event.getCommand().getExecutor();
+                if (obj instanceof Member) return ((Member) obj);
+                return null;
             }
         }, 0);
 
         EventValues.registerEventValue(BukkitDiscordCommandEvent.class, User.class, new Getter<User, BukkitDiscordCommandEvent>() {
             @Override
             public User get(BukkitDiscordCommandEvent event) {
-                return event.getCommand().getMember().getUser();
+                Object obj = event.getCommand().getExecutor();
+                if (obj instanceof Member) return ((Member) obj).getUser();
+                return ((User) event.getCommand().getExecutor());
             }
         }, 0);
 
@@ -63,6 +68,13 @@ public class EvtDiscordCommand extends SkriptEvent {
             @Override
             public MessageChannel get(BukkitDiscordCommandEvent event) {
                 return event.getCommand().getChannel();
+            }
+        }, 0);
+
+        EventValues.registerEventValue(BukkitDiscordCommandEvent.class, DiscordBot.class, new Getter<DiscordBot, BukkitDiscordCommandEvent>() {
+            @Override
+            public DiscordBot get(BukkitDiscordCommandEvent event) {
+                return event.getCommand().getBot();
             }
         }, 0);
     }
@@ -74,7 +86,7 @@ public class EvtDiscordCommand extends SkriptEvent {
             .addEntry("aliases", true)
             .addEntry("description", true)
             .addEntry("roles", true)
-            .addEntry("bots", true) // TODO not sure how to do this, multiple bots confuse me
+            .addEntry("bots", true)
             .addEntry("executable in", true)
             .addEntry("permissions", true)
             .addEntry("permission message", true)
@@ -93,6 +105,7 @@ public class EvtDiscordCommand extends SkriptEvent {
     private String description;
     private final List<String> executableIn = new ArrayList<>();
     private final List<String> roles = new ArrayList<>();
+    private final List<String> bots = new ArrayList<>();
     private final List<Permission> permissions = new ArrayList<>();
     private String permissionMessage;
     private Expression<Timespan> cooldownExpr;
@@ -130,6 +143,9 @@ public class EvtDiscordCommand extends SkriptEvent {
 
         String rawRoles = ScriptLoader.replaceOptions(node.get("roles", ""));
         Collections.addAll(roles, rawRoles.split(listPattern));
+
+        String rawBots = ScriptLoader.replaceOptions(node.get("bots", ""));
+        Collections.addAll(bots, rawBots.split(listPattern));
 
         String rawExecutable = ScriptLoader.replaceOptions(node.get("executable in", "guild and dm"));
         Collections.addAll(executableIn, rawExecutable.split(listPattern));
@@ -257,26 +273,31 @@ public class EvtDiscordCommand extends SkriptEvent {
         BukkitDiscordCommandEvent event = (BukkitDiscordCommandEvent) e;
         DiscordCommand command = event.getCommand();
         if (commandMatches(command.getUsedAlias())) {
-            Member member = command.getMember();
-            Guild guild = member.getGuild();
-            boolean hasRole = false;
-            for (String roleName : roles) {
-                List<Role> guildRolesByName = guild.getRolesByName(roleName, false);
-                for (Role role : guildRolesByName) {
-                    if (member.getRoles().contains(role)) {
-                        hasRole = true;
-                        break;
-                    }
-                }
-                if (hasRole) break;
-            }
-            if (!hasRole) return false;
+            Object obj = command.getExecutor();
+            if (!bots.isEmpty() && !bots.contains(command.getBot().getName())) return false;
             if (!command.isInGuild() && !executableIn.contains("guild")) return false;
-            if (member.hasPermission(permissions)) {
-                if (!permissionMessage.isEmpty()) {
-                    command.getChannel().sendMessage(permissionMessage).queue();
+            Member member = null;
+            if (obj instanceof Member) member = (Member) obj;
+            if (member != null) {
+                Guild guild = member.getGuild();
+                boolean hasRole = false;
+                for (String roleName : roles) {
+                    List<Role> guildRolesByName = guild.getRolesByName(roleName, false);
+                    for (Role role : guildRolesByName) {
+                        if (member.getRoles().contains(role)) {
+                            hasRole = true;
+                            break;
+                        }
+                    }
+                    if (hasRole) break;
                 }
-                return false;
+                if (!hasRole) return false;
+                if (member.hasPermission(permissions)) {
+                    if (!permissionMessage.isEmpty()) {
+                        command.getChannel().sendMessage(permissionMessage).queue();
+                    }
+                    return false;
+                }
             }
             if (cooldownExpr != null) {
                 Timespan cooldown = cooldownExpr.getSingle(event);
