@@ -19,9 +19,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.jetbrains:annotations:20.1.0'
+    compileOnly 'org.jetbrains:annotations:22.0.0'
     compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
-    compileOnly ('com.github.APickledWalrus:Skript:b3e1314') {
+    compileOnly ('com.github.SkriptLang:Skript:2.6-beta3') {
         transitive = false
     }
     implementation ('com.github.DV8FromTheWorld:JDA:196f31f') {

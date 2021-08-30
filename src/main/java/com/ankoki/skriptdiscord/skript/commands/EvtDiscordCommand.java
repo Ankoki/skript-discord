@@ -77,6 +77,17 @@ public class EvtDiscordCommand extends SkriptEvent {
                 return event.getCommand().getBot();
             }
         }, 0);
+
+        EventValues.registerEventValue(BukkitDiscordCommandEvent.class, Guild.class, new Getter<Guild, BukkitDiscordCommandEvent>() {
+            @Override
+            public Guild get(BukkitDiscordCommandEvent event) {
+                MessageChannel channel = event.getCommand().getChannel();
+                if (channel instanceof TextChannel) {
+                    return ((TextChannel) channel).getGuild();
+                }
+                return null;
+            }
+        }, 0);
     }
 
     private static final Pattern argumentPattern = Pattern.compile("<\\s*(?:(.+?)\\s*:\\s*)?(.+?)\\s*(?:=\\s*(" + SkriptParser.wildcard + "))?\\s*>");
@@ -95,7 +106,7 @@ public class EvtDiscordCommand extends SkriptEvent {
             .addEntry("prefixes", false)
             .addSection("trigger", false);
     public static List<Argument<?>> lastArguments = new ArrayList<>();
-    private static final Map<String, Long> commandCooldowns = new HashMap<>();
+    private static final Map<User, Map<String, Long>> commandCooldowns = new HashMap<>();
 
     private String commandName;
     private String unparsedArguments;
@@ -133,6 +144,9 @@ public class EvtDiscordCommand extends SkriptEvent {
             return false;
         }
 
+        commandName = parseResult.regexes.get(0).group(1);
+        unparsedArguments = parseResult.regexes.get(0).group(2);
+
         String rawAliases = ScriptLoader.replaceOptions(node.get("aliases", ""));
         if (!rawAliases.equals("")) {
             Collections.addAll(aliases, rawAliases.split(listPattern));
@@ -151,33 +165,39 @@ public class EvtDiscordCommand extends SkriptEvent {
         Collections.addAll(executableIn, rawExecutable.split(listPattern));
 
         String rawPermissions = ScriptLoader.replaceOptions(node.get("permission", ""));
-        for (String perm : rawPermissions.split(listPattern)) {
-            try {
-                Permission permission = Permission.valueOf(perm.toUpperCase().replace(" ", "_"));
-                permissions.add(permission);
-            } catch (IllegalArgumentException ex) {
-                Skript.error("'" + perm + "' is not a valid permission!");
-                return false;
+        String[] splitPermissions = rawPermissions.split(listPattern);
+        if (splitPermissions.length >= 1) {
+            for (String perm : splitPermissions) {
+                try {
+                    if (perm.isEmpty()) break;
+                    Permission permission = Permission.valueOf(perm.toUpperCase().replace(" ", "_"));
+                    permissions.add(permission);
+                } catch (IllegalArgumentException ex) {
+                    Skript.error("'" + perm + "' is not a valid permission!");
+                    return false;
+                }
             }
         }
 
         permissionMessage = ScriptLoader.replaceOptions(node.get("permission message", ""));
 
         String rawCooldown = ScriptLoader.replaceOptions(node.get("cooldown", ""));
-        ParseResult result = SkriptParser.parse(rawCooldown, "%timespan%");
-        if (result == null) cooldownExpr = null;
-        else {
-            if (result.exprs.length < 1) cooldownExpr = null;
-            else cooldownExpr = (Expression<Timespan>) result.exprs[0];
+        if (!rawCooldown.isEmpty()) {
+            ParseResult result = SkriptParser.parse(rawCooldown, "%timespan%");
+            if (result != null) {
+                if (result.exprs.length >= 1) {
+                    cooldownExpr = (Expression<Timespan>) result.exprs[0];
+                } else {
+                    Skript.error("'" + rawCooldown + "' is not a valid timespan!");
+                    return false;
+                }
+            }
         }
 
         cooldownMessage = ScriptLoader.replaceOptions(node.get("cooldown message", ""));
 
         String rawPrefixes = ScriptLoader.replaceOptions(node.get("prefixes", ""));
         Collections.addAll(prefixes, rawPrefixes.split(listPattern));
-
-        commandName = parseResult.regexes.get(0).group(1);
-        unparsedArguments = parseResult.regexes.get(0).group(2);
 
         String fullPattern = node.getKey();
         if (fullPattern == null) return false;
@@ -264,7 +284,6 @@ public class EvtDiscordCommand extends SkriptEvent {
         for (Node subNode : tempNodes) {
             node.remove(subNode);
         }
-
         return true;
     }
 
@@ -273,44 +292,58 @@ public class EvtDiscordCommand extends SkriptEvent {
         BukkitDiscordCommandEvent event = (BukkitDiscordCommandEvent) e;
         DiscordCommand command = event.getCommand();
         if (commandMatches(command.getUsedAlias())) {
-            Object obj = command.getExecutor();
-            if (!bots.isEmpty() && !bots.contains(command.getBot().getName())) return false;
+            DiscordBot usedBot = command.getBot();
+            if (usedBot != null) {
+                if (!bots.isEmpty() && !bots.contains(command.getBot().getName())) return false;
+            }
             if (!command.isInGuild() && !executableIn.contains("guild")) return false;
             Member member = null;
+            Object obj = command.getExecutor();
             if (obj instanceof Member) member = (Member) obj;
             if (member != null) {
                 Guild guild = member.getGuild();
-                boolean hasRole = false;
-                for (String roleName : roles) {
-                    List<Role> guildRolesByName = guild.getRolesByName(roleName, false);
-                    for (Role role : guildRolesByName) {
-                        if (member.getRoles().contains(role)) {
-                            hasRole = true;
-                            break;
+                if (!roles.isEmpty() && (roles.size() != 1 && !roles.get(0).isEmpty())) {
+                    boolean hasRole = false;
+                    for (String roleName : roles) {
+                        if (roleName.isEmpty()) continue;
+                        List<Role> guildRolesByName = guild.getRolesByName(roleName, false);
+                        for (Role role : guildRolesByName) {
+                            if (member.getRoles().contains(role)) {
+                                hasRole = true;
+                                break;
+                            }
                         }
+                        if (hasRole) break;
                     }
-                    if (hasRole) break;
+                    if (!hasRole) return false;
                 }
-                if (!hasRole) return false;
-                if (member.hasPermission(permissions)) {
+                if (!permissions.isEmpty() && member.hasPermission(permissions)) {
                     if (!permissionMessage.isEmpty()) {
                         command.getChannel().sendMessage(permissionMessage).queue();
                     }
                     return false;
                 }
             }
+            User user;
+            if (obj instanceof Member) user = ((Member) obj).getUser();
+            else user = (User) obj;
             if (cooldownExpr != null) {
                 Timespan cooldown = cooldownExpr.getSingle(event);
                 if (cooldown != null) {
                     long millis = cooldown.getMilliSeconds();
-                    if (commandCooldowns.containsKey(commandName)) {
-                        long lastExecuted = commandCooldowns.get(commandName);
-                        if (System.currentTimeMillis() - millis < lastExecuted) {
-                            if (!cooldownMessage.isEmpty()) command.getChannel().sendMessage(cooldownMessage).queue();
-                            return false;
+                    Map<String, Long> lastExecuted = new HashMap<>();
+                    if (commandCooldowns.containsKey(user)) {
+                        lastExecuted = commandCooldowns.get(user);
+                        if (lastExecuted.containsKey(commandName)) {
+                            long lastMillis = lastExecuted.get(commandName);
+                            if (System.currentTimeMillis() - millis < lastMillis) {
+                                if (!cooldownMessage.isEmpty()) com.ankoki.skriptdiscord.utils.Utils.runAsync(() -> command.getChannel().sendMessage(cooldownMessage).queue());
+                                return false;
+                            }
                         }
                     }
-                    commandCooldowns.put(commandName, System.currentTimeMillis());
+                    lastExecuted.put(commandName, System.currentTimeMillis());
+                    commandCooldowns.put(user, lastExecuted);
                 }
             }
             ParseResult result = SkriptParser.parse(String.join(" ", command.getUnparsedArguments()), argumentSkriptPattern);

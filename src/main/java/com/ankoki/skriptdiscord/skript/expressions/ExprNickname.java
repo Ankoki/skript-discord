@@ -10,7 +10,8 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
-import com.ankoki.skriptdiscord.utils.Utils;
+import com.ankoki.skriptdiscord.api.bot.BotManager;
+import com.ankoki.skriptdiscord.api.bot.DiscordBot;
 import jdk.jfr.Description;
 import jdk.jfr.Name;
 import net.dv8tion.jda.api.entities.Member;
@@ -24,14 +25,16 @@ public class ExprNickname extends SimpleExpression<String> {
 
     static {
         Skript.registerExpression(ExprNickname.class, String.class, ExpressionType.SIMPLE,
-                "%discordmember%[']s nick[name]");
+                "%discordmember%[']s nick[name] [using %-discordbot%]");
     }
 
     private Expression<Member> memberExpr;
+    private Expression<DiscordBot> botExpr;
 
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
         memberExpr = (Expression<Member>) exprs[0];
+        botExpr = exprs.length >= 2 ? (Expression<DiscordBot>) exprs[1] : null;
         return true;
     }
 
@@ -61,7 +64,7 @@ public class ExprNickname extends SimpleExpression<String> {
     public Class<?>[] acceptChange(ChangeMode mode) {
         if (mode == ChangeMode.SET) {
             return CollectionUtils.array(String.class);
-        }
+        } else if (mode == ChangeMode.DELETE || mode == ChangeMode.RESET) return new Class[0];
         return null;
     }
 
@@ -71,10 +74,10 @@ public class ExprNickname extends SimpleExpression<String> {
         if (member != null) {
             String nickname = null;
             if (delta.length >= 1 && delta[0] instanceof String) nickname = (String) delta[0];
-            String finalNickname = nickname;
-            Utils.runAsync(() -> {
-                member.modifyNickname(finalNickname).queue();
-            });
+            DiscordBot bot = botExpr == null ? BotManager.getFirstBot() :
+                    (botExpr.getSingle(event) == null ? BotManager.getFirstBot() : botExpr.getSingle(event));
+            if (bot == null) return;
+            bot.changeNickname(member, nickname);
         }
     }
 }

@@ -12,10 +12,7 @@ import com.ankoki.skriptdiscord.api.DiscordMessage;
 import com.ankoki.skriptdiscord.api.bot.BotManager;
 import com.ankoki.skriptdiscord.utils.Console;
 import com.ankoki.skriptdiscord.utils.Utils;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -57,10 +54,16 @@ public class SkriptDiscord extends JavaPlugin {
     }
 
     private void registerClassInfo() {
-        Classes.registerClass(new ClassInfo<>(DiscordMessage.class, "discordmessage")
+        Classes.registerClass(new ClassInfo<>(DiscordMessage.class, "skdiscordmessage")
+                .user("skdiscordmessage?s?")
+                .name("Skript-Discord Message")
+                .description("A DiscordMessage object.")
+                .since("1.0"));
+
+        Classes.registerClass(new ClassInfo<>(Message.class, "discordmessage")
                 .user("discordmessage?s?")
                 .name("Discord Message")
-                .description("A DiscordMessage object.")
+                .description("A Message object.")
                 .since("1.0"));
 
         Classes.registerClass(new ClassInfo<>(DiscordBot.class, "discordbot")

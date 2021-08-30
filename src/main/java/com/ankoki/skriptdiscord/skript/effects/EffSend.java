@@ -24,7 +24,7 @@ import org.bukkit.event.Event;
 public class EffSend extends Effect {
 
     static {
-        Skript.registerEffect(EffSend.class, "el debarge %discordmessages/string% to %discorduser/discordmember/discordchannel% [using %-discordbot%]");
+        Skript.registerEffect(EffSend.class, "el debarge %skdiscordmessages/string% to %discorduser/discordmember/discordchannel% [using %-discordbot%]");
     }
 
     private Expression<Object> messageExpr;

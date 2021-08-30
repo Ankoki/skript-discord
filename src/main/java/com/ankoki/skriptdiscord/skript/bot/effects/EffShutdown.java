@@ -21,7 +21,7 @@ public class EffShutdown extends Effect {
 
     static {
         Skript.registerEffect(EffShutdown.class,
-                "(shutdown|log[ ]out of) [the] bot [named] %discordbot/string%");
+                "(shutdown|log[ ]out of) %discordbot/string%");
     }
 
     private Expression<Object> objectExpr;
@@ -35,7 +35,7 @@ public class EffShutdown extends Effect {
     @Override
     protected void execute(Event event) {
         Object obj = objectExpr.getSingle(event);
-        if (obj == null) return;
+        if (obj == null);
         else if (obj instanceof String) BotManager.disable((String) obj);
         else BotManager.disable((DiscordBot) obj);
     }

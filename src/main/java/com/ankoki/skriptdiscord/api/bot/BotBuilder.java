@@ -32,9 +32,6 @@ public class BotBuilder {
     private String token;
     @Getter
     @Setter
-    private String prefix;
-    @Getter
-    @Setter
     private Activity activity;
 
     private boolean init;
