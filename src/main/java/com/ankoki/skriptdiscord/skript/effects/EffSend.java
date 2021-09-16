@@ -24,7 +24,7 @@ import org.bukkit.event.Event;
 public class EffSend extends Effect {
 
     static {
-        Skript.registerEffect(EffSend.class, "el debarge %skdiscordmessages/string% to %discorduser/discordmember/discordchannel% [using %-discordbot%]");
+        Skript.registerEffect(EffSend.class, "[[skript-]discord] send %skdiscordmessages/strings% to %discorduser/discordmember/discordchannel% [using %-discordbot%]");
     }
 
     private Expression<Object> messageExpr;
@@ -55,6 +55,6 @@ public class EffSend extends Effect {
 
     @Override
     public String toString(Event e, boolean debug) {
-        return "send " + messageExpr.toString(e, debug) + " to " + receiverExpr.toString(e, debug) + " with discord";
+        return "send " + messageExpr.toString(e, debug) + " to " + receiverExpr.toString(e, debug);
     }
 }

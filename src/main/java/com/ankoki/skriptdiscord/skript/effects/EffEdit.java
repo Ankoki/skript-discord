@@ -12,6 +12,7 @@ import ch.njol.util.Kleenean;
 import com.ankoki.skriptdiscord.api.DiscordMessage;
 import com.ankoki.skriptdiscord.api.bot.BotManager;
 import com.ankoki.skriptdiscord.api.bot.DiscordBot;
+import com.ankoki.skriptdiscord.utils.Console;
 import net.dv8tion.jda.api.entities.Message;
 import org.bukkit.event.Event;
 
@@ -44,13 +45,15 @@ public class EffEdit extends Effect {
         Object replyObject = replyExpr.getSingle(event);
         DiscordBot bot = botExpr == null ? BotManager.getFirstBot() : botExpr.getSingle(event);
         if (message == null || replyObject == null || bot == null) return;
+        Console.debug("Nothing null.");
         DiscordMessage discordMessage = new DiscordMessage(replyObject);
         bot.edit(message, discordMessage);
+        Console.debug("'Edited'.");
     }
 
     @Override
     public String toString(Event e, boolean debug) {
         return "edit " + messageExpr.toString(e, debug) + " to " + replyExpr.toString(e, debug) +
-                (botExpr == null ? "" : "using " + botExpr.toString(e, debug));
+                (botExpr == null ? "" : " using " + botExpr.toString(e, debug));
     }
 }

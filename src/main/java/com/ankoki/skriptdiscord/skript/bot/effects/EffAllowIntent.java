@@ -7,7 +7,7 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.util.Kleenean;
 import com.ankoki.skriptdiscord.api.bot.BotBuilder;
@@ -37,7 +37,7 @@ public class EffAllowIntent extends Effect {
     private Expression<GatewayIntent> intentExpr;
 
     @Override
-    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
+    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
         if (!ParserInstance.get().isCurrentSection(SecIntents.class)) {
             Skript.error("You cannot use this outside of an allow intents section!");
             return false;

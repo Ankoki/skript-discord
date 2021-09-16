@@ -100,24 +100,24 @@ public class Argument<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public void set(Event e, Object[] o) {
-        if (!(type.getC().isAssignableFrom(o.getClass().getComponentType())))
+    public void set(Event event, Object[] objects) {
+        if (!type.getC().isAssignableFrom(objects.getClass().getComponentType()))
             throw new IllegalArgumentException();
-        current.put(e, (T[]) o);
+        current.put(event, (T[]) objects);
         String name = this.name;
         if (name != null) {
             if (single) {
-                if (o.length > 0)
-                    Variables.setVariable(name, o[0], e, true);
+                if (objects.length > 0)
+                    Variables.setVariable(name, objects[0], event, true);
             } else {
-                for (int i = 0; i < o.length; i++)
-                    Variables.setVariable(name + "::" + (i + 1), o[i], e, true);
+                for (int i = 0; i < objects.length; i++)
+                    Variables.setVariable(name + "::" + (i + 1), objects[i], event, true);
             }
         }
     }
 
-    public T[] getCurrent(Event e) {
-        return current.get(e);
+    public T[] getCurrent(Event event) {
+        return current.get(event);
     }
 
     public Class<T> getType() {

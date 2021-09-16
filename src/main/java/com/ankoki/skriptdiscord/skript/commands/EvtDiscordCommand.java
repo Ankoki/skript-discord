@@ -99,7 +99,7 @@ public class EvtDiscordCommand extends SkriptEvent {
             .addEntry("roles", true)
             .addEntry("bots", true)
             .addEntry("executable in", true)
-            .addEntry("permissions", true)
+            .addEntry("permission", true)
             .addEntry("permission message", true)
             .addEntry("cooldown", true)
             .addEntry("cooldown message", true)
@@ -173,8 +173,7 @@ public class EvtDiscordCommand extends SkriptEvent {
                     Permission permission = Permission.valueOf(perm.toUpperCase().replace(" ", "_"));
                     permissions.add(permission);
                 } catch (IllegalArgumentException ex) {
-                    Skript.error("'" + perm + "' is not a valid permission!");
-                    return false;
+                    Skript.warning("'" + perm + "' is not a valid permission! It shall not be checked for.");
                 }
             }
         }
@@ -188,8 +187,7 @@ public class EvtDiscordCommand extends SkriptEvent {
                 if (result.exprs.length >= 1) {
                     cooldownExpr = (Expression<Timespan>) result.exprs[0];
                 } else {
-                    Skript.error("'" + rawCooldown + "' is not a valid timespan!");
-                    return false;
+                    Skript.warning("'" + rawCooldown + "' is not a valid timespan! There will be no cooldown for this command.");
                 }
             }
         }
@@ -271,7 +269,7 @@ public class EvtDiscordCommand extends SkriptEvent {
         String registered = CommandManager.get().isRegistered(commandName);
 
         if (registered != null) {
-            Skript.error("Discord command " + commandName + " is already registered! (" + registered + ")");
+            Skript.error("Discord command " + commandName + " is already registered! (" + registered + ".sk)");
             return false;
         }
         CommandManager.get().addCommand(node.getConfig().getFile(), commandName);
@@ -346,18 +344,20 @@ public class EvtDiscordCommand extends SkriptEvent {
                     commandCooldowns.put(user, lastExecuted);
                 }
             }
-            ParseResult result = SkriptParser.parse(String.join(" ", command.getUnparsedArguments()), argumentSkriptPattern);
-            if (result == null) return false;
-            Expression<?>[] exprs = result.exprs;
-            if (exprs.length != currentArguments.size()) return false;
-            int i = 0;
-            for (Argument<?> argument : currentArguments) {
-                if (exprs[i] == null) {
-                    argument.setToDefault(event);
-                } else {
-                    argument.set(event, exprs[i].getArray(event));
+            if (argumentSkriptPattern != null && !argumentSkriptPattern.isEmpty()) {
+                ParseResult result = SkriptParser.parse(String.join(" ", command.getUnparsedArguments()), argumentSkriptPattern);
+                if (result == null) return false;
+                Expression<?>[] exprs = result.exprs;
+                if (exprs.length != currentArguments.size()) return false;
+                int i = 0;
+                for (Argument<?> argument : currentArguments) {
+                    if (exprs[i] == null) {
+                        argument.setToDefault(event);
+                    } else {
+                        argument.set(event, exprs[i].getArray(event));
+                    }
+                    i++;
                 }
-                i++;
             }
             trigger.execute(event);
             return true;

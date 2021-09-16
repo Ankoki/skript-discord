@@ -23,7 +23,7 @@ public class EffReply extends Effect {
 
     static {
         Skript.registerEffect(EffReply.class,
-                "reply to %discordmessage% with %skdiscordmessage/string% [using %-discordbot%]");
+                "[[skript-]discord] reply to %discordmessage% with %skdiscordmessage/string% [using %-discordbot%]");
     }
 
     private Expression<Message> messageExpr;
