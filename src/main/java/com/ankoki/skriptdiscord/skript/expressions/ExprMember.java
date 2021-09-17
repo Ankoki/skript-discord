@@ -17,10 +17,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import org.bukkit.event.Event;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicReference;
-
 @Name("Discord Member")
 @Description("Gets a member from an id.")
 @Examples("set {_member} to member with id 722898458020937769 from {_guild}")
@@ -29,16 +25,18 @@ public class ExprMember extends SimpleExpression<Member> {
 
     static {
         Skript.registerExpression(ExprMember.class, Member.class, ExpressionType.SIMPLE,
-                "[the] [discord] member with id %number/string% from %discordguild%");
+                "[the] [discord] member with id %number/string% from %discordguild% [using %-discordbot%]");
     }
 
     private Expression<Object> idExpr;
     private Expression<Guild> guildExpr;
+    private Expression<DiscordBot> botExpr;
 
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
         idExpr = (Expression<Object>) exprs[0];
         guildExpr = (Expression<Guild>) exprs[1];
+        botExpr = exprs.length >= 3 ? (Expression<DiscordBot>) exprs[2] : null;
         return true;
     }
 
@@ -46,35 +44,10 @@ public class ExprMember extends SimpleExpression<Member> {
     protected Member[] get(Event event) {
         Object object = idExpr.getSingle(event);
         Guild guild = guildExpr.getSingle(event);
-        if (guild == null || object == null) return new Member[0];
-        DiscordBot bot = BotManager.getFirstBot();
-        if (bot == null) {
-            Skript.error("There is no bot to complete this action.");
-            return new Member[0];
-        }
+        DiscordBot bot = botExpr == null ? BotManager.getFirstBot() : botExpr.getSingle(event);
+        if (guild == null || object == null || bot == null) return new Member[0];
         Delay.addDelayedEvent(event);
-        CompletableFuture<Member> future = CompletableFuture.supplyAsync(() -> {
-            AtomicReference<Member> memberAR = null;
-            if (object instanceof String) {
-                guild.retrieveMemberById((String) object).queue(member -> {
-                    memberAR.set(member);
-                });
-            } else {
-                guild.retrieveMemberById((Long) object).queue(member -> {
-                    memberAR.set(member);
-                });
-            }
-            while (memberAR.get() == null){}
-            return memberAR.get();
-        });
-        while (!future.isDone()){}
-        try {
-            return new Member[]{future.get()};
-        } catch (InterruptedException | ExecutionException ex) {
-            ex.printStackTrace();
-            Skript.error("Something went horrifically wrong retrieving this member!");
-        }
-        return new Member[0];
+        return new Member[]{bot.getMember(guild, String.valueOf(object))};
     }
 
     @Override

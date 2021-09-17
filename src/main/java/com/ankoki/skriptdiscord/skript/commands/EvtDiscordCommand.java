@@ -99,7 +99,8 @@ public class EvtDiscordCommand extends SkriptEvent {
             .addEntry("roles", true)
             .addEntry("bots", true)
             .addEntry("executable in", true)
-            .addEntry("permission", true)
+            .addEntry("permissions", true) // I have added permissions and permission so people can
+            .addEntry("permission", true) // choose between, although if there is both it won't work.
             .addEntry("permission message", true)
             .addEntry("cooldown", true)
             .addEntry("cooldown message", true)
@@ -142,6 +143,9 @@ public class EvtDiscordCommand extends SkriptEvent {
         } else if (!(node.get("prefixes") instanceof EntryNode)) {
             Skript.error("The prefixes cannot be a section!");
             return false;
+        } else if (node.get("permission") != null && node.get("permissions") != null) {
+            Skript.error("You cannot have two permission entries! Use only one!");
+            return false;
         }
 
         commandName = parseResult.regexes.get(0).group(1);
@@ -165,6 +169,7 @@ public class EvtDiscordCommand extends SkriptEvent {
         Collections.addAll(executableIn, rawExecutable.split(listPattern));
 
         String rawPermissions = ScriptLoader.replaceOptions(node.get("permission", ""));
+        if (rawPermissions.isEmpty()) rawPermissions = ScriptLoader.replaceOptions(node.get("permissions", ""));
         String[] splitPermissions = rawPermissions.split(listPattern);
         if (splitPermissions.length >= 1) {
             for (String perm : splitPermissions) {

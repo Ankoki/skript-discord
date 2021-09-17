@@ -23,7 +23,7 @@ import org.bukkit.event.Event;
 public class EffEdit extends Effect {
 
     static {
-        Skript.registerEffect(EffReply.class,
+        Skript.registerEffect(EffEdit.class,
                 "edit %discordmessage% to [be] %skdiscordmessage/string% [using %-discordbot%]");
     }
 
@@ -45,10 +45,8 @@ public class EffEdit extends Effect {
         Object replyObject = replyExpr.getSingle(event);
         DiscordBot bot = botExpr == null ? BotManager.getFirstBot() : botExpr.getSingle(event);
         if (message == null || replyObject == null || bot == null) return;
-        Console.debug("Nothing null.");
         DiscordMessage discordMessage = new DiscordMessage(replyObject);
         bot.edit(message, discordMessage);
-        Console.debug("'Edited'.");
     }
 
     @Override

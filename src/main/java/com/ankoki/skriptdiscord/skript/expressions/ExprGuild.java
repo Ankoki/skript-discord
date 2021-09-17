@@ -13,6 +13,7 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import com.ankoki.skriptdiscord.api.bot.DiscordBot;
 import com.ankoki.skriptdiscord.api.bot.BotManager;
+import com.ankoki.skriptdiscord.utils.Utils;
 import net.dv8tion.jda.api.entities.Guild;
 import org.bukkit.event.Event;
 
@@ -31,40 +32,22 @@ public class ExprGuild extends SimpleExpression<Guild> {
     }
 
     private Expression<Object> idExpr;
+    private Expression<DiscordBot> botExpr;
 
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
         idExpr = (Expression<Object>) exprs[0];
+        botExpr = (Expression<DiscordBot>) exprs[1];
         return true;
     }
 
     @Override
     protected Guild[] get(Event event) {
         Object object = idExpr.getSingle(event);
-        if (object == null) return new Guild[0];
+        DiscordBot bot = botExpr == null ? BotManager.getFirstBot() : botExpr.getSingle(event);
+        if (object == null || bot == null) return new Guild[0];
         Delay.addDelayedEvent(event);
-        DiscordBot bot = BotManager.getFirstBot();
-        if (bot == null) {
-            Skript.error("There is no bot to complete this action.");
-            return new Guild[0];
-        }
-        CompletableFuture<Guild> future = CompletableFuture.supplyAsync(() -> {
-            Guild guild;
-            if (object instanceof String) {
-                guild = bot.getJda().getGuildById((String) object);
-            } else {
-                guild = bot.getJda().getGuildById(((Number) object).longValue());
-            }
-            return guild;
-        });
-        while (!future.isDone()){}
-        try {
-            return new Guild[]{future.get()};
-        } catch (InterruptedException | ExecutionException ex) {
-            Skript.error("Something went horrifically wrong retrieving this guild!");
-            ex.printStackTrace();
-        }
-        return new Guild[0];
+        return new Guild[]{bot.getGuild(String.valueOf(object))};
     }
 
     @Override

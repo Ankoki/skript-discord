@@ -10,6 +10,7 @@ import ch.njol.util.Kleenean;
 import com.ankoki.skriptdiscord.api.DiscordMessage;
 import com.ankoki.skriptdiscord.api.bot.BotManager;
 import com.ankoki.skriptdiscord.api.bot.DiscordBot;
+import com.ankoki.skriptdiscord.utils.Console;
 import jdk.jfr.Description;
 import jdk.jfr.Name;
 import net.dv8tion.jda.api.entities.Message;
@@ -24,6 +25,7 @@ public class EffReply extends Effect {
     static {
         Skript.registerEffect(EffReply.class,
                 "[[skript-]discord] reply to %discordmessage% with %skdiscordmessage/string% [using %-discordbot%]");
+        Console.debug("EffReply static");
     }
 
     private Expression<Message> messageExpr;
@@ -35,6 +37,7 @@ public class EffReply extends Effect {
         messageExpr = (Expression<Message>) exprs[0];
         replyExpr = (Expression<Object>) exprs[1];
         botExpr = exprs.length >= 3 ? (Expression<DiscordBot>) exprs[2] : null;
+        Console.debug("EffReply init");
         return true;
     }
 

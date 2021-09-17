@@ -11,12 +11,11 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
+import com.ankoki.skriptdiscord.api.bot.BotManager;
+import com.ankoki.skriptdiscord.api.bot.DiscordBot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import org.bukkit.event.Event;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @Name("Discord Message Channel")
 @Description("Gets a message channel from an id and a guild.")
@@ -26,16 +25,18 @@ public class ExprChannel extends SimpleExpression<MessageChannel> {
 
     static {
         Skript.registerExpression(ExprChannel.class, MessageChannel.class, ExpressionType.SIMPLE,
-                "[the] [discord] [(text|message)] channel with id %number/string% (from|in) %discordguild%");
+                "[the] [discord] [(text|message)] channel with id %number/string% (from|in) %discordguild% [using %-discordbot%]");
     }
 
     private Expression<Object> idExpr;
     private Expression<Guild> guildExpr;
+    private Expression<DiscordBot> botExpr;
 
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
         idExpr = (Expression<Object>) exprs[0];
         guildExpr = (Expression<Guild>) exprs[1];
+        botExpr = exprs.length >= 3 ? (Expression<DiscordBot>) exprs[2] : null;
         return true;
     }
 
@@ -43,25 +44,10 @@ public class ExprChannel extends SimpleExpression<MessageChannel> {
     protected MessageChannel[] get(Event event) {
         Object id = idExpr.getSingle(event);
         Guild guild = guildExpr.getSingle(event);
-        if (id == null || guild == null) return new MessageChannel[0];
+        DiscordBot bot = botExpr == null ? BotManager.getFirstBot() : botExpr.getSingle(event);
+        if (id == null || guild == null || bot == null) return new MessageChannel[0];
         Delay.addDelayedEvent(event);
-        CompletableFuture<MessageChannel> future = CompletableFuture.supplyAsync(() -> {
-            MessageChannel channel;
-            if (id instanceof String) {
-                channel = guild.getTextChannelById((String) id);
-            } else {
-                channel = guild.getTextChannelById((long) id);
-            }
-            return channel;
-        });
-        while (!future.isDone()){}
-        try {
-            return new MessageChannel[]{future.get()};
-        } catch (InterruptedException | ExecutionException ex) {
-            Skript.error("Something went horrifically wrong retrieving this channel!");
-            ex.printStackTrace();
-        }
-        return new MessageChannel[0];
+        return new MessageChannel[]{bot.getChannel(guild, String.valueOf(id))};
     }
 
     @Override

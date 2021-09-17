@@ -16,6 +16,8 @@ repositories {
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     // Skript
     maven { url 'https://jitpack.io/' }
+    // Discord and Opus
+    maven { url 'https://m2.dv8tion.net/releases'}
 }
 
 dependencies {
@@ -24,9 +26,8 @@ dependencies {
     compileOnly ('com.github.SkriptLang:Skript:2.6-beta3') {
         transitive = false
     }
-    implementation ('com.github.DV8FromTheWorld:JDA:196f31f') {
-        exclude module: 'opus-java'
-    }
+    implementation 'com.github.DV8FromTheWorld:JDA:196f31f'
+    implementation 'club.minnced:opus-java-api:1.0.4'
     compileOnly 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
 }

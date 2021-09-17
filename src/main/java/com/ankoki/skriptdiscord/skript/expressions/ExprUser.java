@@ -17,10 +17,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import org.bukkit.event.Event;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicReference;
-
 @Name("Discord User")
 @Description("Gets a user from an id.")
 @Examples("set {_user} to user with id 722898458020937769 from {_guild}")
@@ -29,16 +25,18 @@ public class ExprUser extends SimpleExpression<User> {
 
     static {
         Skript.registerExpression(ExprUser.class, User.class, ExpressionType.SIMPLE,
-                "[the] [discord] user with id %number/string% from %discordguild%");
+                "[the] [discord] user with id %number/string% from %discordguild% [using %-discordbot%]");
     }
 
     private Expression<Object> idExpr;
     private Expression<Guild> guildExpr;
+    private Expression<DiscordBot> botExpr;
 
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
         idExpr = (Expression<Object>) exprs[0];
         guildExpr = (Expression<Guild>) exprs[1];
+        botExpr = exprs.length >= 3 ? (Expression<DiscordBot>) exprs[2] : null;
         return true;
     }
 
@@ -46,35 +44,10 @@ public class ExprUser extends SimpleExpression<User> {
     protected User[] get(Event event) {
         Object object = idExpr.getSingle(event);
         Guild guild = guildExpr.getSingle(event);
-        if (guild == null || object == null) return new User[0];
-        DiscordBot bot = BotManager.getFirstBot();
-        if (bot == null) {
-            Skript.error("There is no bot to complete this action.");
-            return new User[0];
-        }
+        DiscordBot bot = botExpr == null ? BotManager.getFirstBot() : botExpr.getSingle(event);
+        if (guild == null || object == null || bot == null) return new User[0];
         Delay.addDelayedEvent(event);
-        CompletableFuture<User> future = CompletableFuture.supplyAsync(() -> {
-            AtomicReference<User> user = new AtomicReference<>();
-            if (object instanceof String) {
-                 guild.retrieveMemberById((String) object).queue(member -> {
-                     user.set(member.getUser());
-                 });
-            } else {
-                guild.retrieveMemberById((Long) object).queue(member -> {
-                    user.set(member.getUser());
-                });
-            }
-            while (user.get() == null){}
-            return user.get();
-        });
-        while (!future.isDone()){}
-        try {
-            return new User[]{future.get()};
-        } catch (InterruptedException | ExecutionException ex) {
-            ex.printStackTrace();
-            Skript.error("Something went horrifically wrong retrieving this user!");
-        }
-        return new User[0];
+        return new User[]{bot.getUser(guild, String.valueOf(object))};
     }
 
     @Override

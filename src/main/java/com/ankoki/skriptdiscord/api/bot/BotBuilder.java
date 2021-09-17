@@ -2,6 +2,7 @@ package com.ankoki.skriptdiscord.api.bot;
 
 import ch.njol.skript.Skript;
 import com.ankoki.skriptdiscord.discord.DiscordListener;
+import com.ankoki.skriptdiscord.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -56,8 +57,7 @@ public class BotBuilder {
                         .setActivity(activity)
                         .build();
             } catch (LoginException | InterruptedException ex) {
-                ex.printStackTrace();
-                Skript.error("skript-discord | Something went horribly wrong when logging into the bot! Is the token correct?");
+                Utils.throwException(ex);
                 return false;
             }
             init = true;
@@ -67,7 +67,7 @@ public class BotBuilder {
         try {
             return future.get();
         } catch (InterruptedException | ExecutionException ex) {
-            ex.printStackTrace();
+            Utils.throwException(ex);
             return false;
         }
     }

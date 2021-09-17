@@ -35,4 +35,11 @@ public final class Utils {
     public static void runAsync(Runnable runnable) {
         Bukkit.getScheduler().runTaskAsynchronously(SkriptDiscord.getInstance(), runnable);
     }
+
+    public static void throwException(Exception ex) {
+        Console.error("Hmmm, something went wrong. Please contact Ankoki#0001 on discord or join our support discord.");
+        Console.error("Please provide us with the whole error so we can solve your issue.");
+        Console.error("Join Aspect Productions here: discord.gg/3RWFg2xDBF");
+        ex.printStackTrace();
+    }
 }

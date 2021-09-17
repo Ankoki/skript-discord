@@ -33,7 +33,11 @@ public class BotManager {
      */
     public static DiscordBot getFirstBot() {
         DiscordBot[] array = DISCORD_BOT_MAP.values().toArray(new DiscordBot[0]);
-        return array.length >= 1 ? array[0] : null;
+        if (array.length <= 0) {
+            Console.debug("There was no bot to perform this action. Please login to a bot!");
+            return null;
+        }
+        return array[0];
     }
 
     /**
