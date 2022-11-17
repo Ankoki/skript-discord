@@ -12,24 +12,19 @@ version '1.0'
 
 repositories {
     mavenCentral()
-    // Spigot
+    // Spigot (Papers being weird)
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     // Skript
     maven { url 'https://jitpack.io/' }
-    // Discord and Opus
-    maven { url 'https://m2.dv8tion.net/releases'}
 }
 
 dependencies {
-    compileOnly 'org.jetbrains:annotations:22.0.0'
-    compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
-    compileOnly ('com.github.SkriptLang:Skript:2.6-beta3') {
-        transitive = false
-    }
-    implementation 'com.github.DV8FromTheWorld:JDA:196f31f'
-    implementation 'club.minnced:opus-java-api:1.0.4'
-    compileOnly 'org.projectlombok:lombok:1.18.20'
-    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    compileOnly 'org.jetbrains:annotations:23.0.0'
+    compileOnly 'org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT'
+    compileOnly files('SKRIPT-STRUCTURES.jar')
+    implementation 'net.dv8tion:JDA:5.0.0-alpha.22'
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
 }
 
 test {

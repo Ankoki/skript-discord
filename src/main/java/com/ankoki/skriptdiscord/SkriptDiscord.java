@@ -2,132 +2,68 @@ package com.ankoki.skriptdiscord;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
-import ch.njol.skript.classes.ClassInfo;
-import ch.njol.skript.classes.Parser;
-import ch.njol.skript.lang.ParseContext;
-import ch.njol.skript.registrations.Classes;
-import ch.njol.skript.registrations.Converters;
-import com.ankoki.skriptdiscord.api.bot.DiscordBot;
-import com.ankoki.skriptdiscord.api.DiscordMessage;
-import com.ankoki.skriptdiscord.api.bot.BotManager;
-import com.ankoki.skriptdiscord.utils.Console;
-import com.ankoki.skriptdiscord.utils.Utils;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.requests.GatewayIntent;
+import com.ankoki.skriptdiscord.misc.Misc;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 
+// To access, use SkriptDiscord.getPlugin(SkriptDiscord.class)
 public class SkriptDiscord extends JavaPlugin {
 
-    private static SkriptDiscord instance;
-    private SkriptAddon addon;
-    private static final DecimalFormat sf = new DecimalFormat("0.00");
+	private SkriptAddon addon;
 
-    @Override
-    public void onEnable() {
-        long start = System.currentTimeMillis();
-        instance = this;
-        addon = Skript.registerAddon(this);
-        registerClassInfo();
-        try {
-            addon.loadClasses("com.ankoki.skriptdiscord.skript");
-        } catch (IOException ex) {
-            Utils.throwException(ex);
-        }
-        long fin = System.currentTimeMillis() - start;
-        Console.log("Successfully enabled in " + sf.format(fin) + " seconds (" + fin + "ms)");
-    }
+	@Override
+	public void onEnable() {
+		if (!Misc.isEnabled("Skript")) {
+			this.error("Skript was not found, is it on your server and enabled?");
+			Bukkit.getPluginManager().disablePlugin(this);
+			return;
+		}
+		addon = Skript.registerAddon(this);
+		this.registerElements();
+		this.info("skript-discord has been enabled.");
+	}
 
-    @Override
-    public void onDisable() {
-        instance = null;
-        addon = null;
-        BotManager.disableAll();
-    }
+	/**
+	 * Logs an informative message.
+	 * @param message the message to log.
+	 */
+	public void info(String message) {
+		this.getLogger().info(message);
+	}
 
-    public static SkriptDiscord getInstance() {
-        return instance;
-    }
+	/**
+	 * Logs a debug message.
+	 * @param message the message to log.
+	 */
+	public void debug(String message) {
+		this.getLogger().warning("DEBUG | " + message);
+	}
 
-    private void registerClassInfo() {
-        Classes.registerClass(new ClassInfo<>(DiscordMessage.class, "skdiscordmessage")
-                .user("skdiscordmessage?s?")
-                .name("Skript-Discord Message")
-                .description("A DiscordMessage object.")
-                .since("1.0"));
+	/**
+	 * Logs a warning message.
+	 * @param message the message to log.
+	 */
+	public void warning(String message) {
+		this.getLogger().warning(message);
+	}
 
-        Classes.registerClass(new ClassInfo<>(Message.class, "discordmessage")
-                .user("discordmessage?s?")
-                .name("Discord Message")
-                .description("A Message object.")
-                .since("1.0"));
+	/**
+	 * Logs an error message.
+	 * @param message the message to log.
+	 */
+	public void error(String message) {
+		this.getLogger().severe(message);
+	}
 
-        Classes.registerClass(new ClassInfo<>(DiscordBot.class, "discordbot")
-                .user("discordbot?s?")
-                .name("Discord Bot")
-                .description("A DiscordBot object.")
-                .since("1.0"));
-
-        Classes.registerClass(new ClassInfo<>(User.class, "discorduser")
-                .user("discorduser?s?")
-                .name("Discord User")
-                .description("A User object.")
-                .since("1.0"));
-
-        Classes.registerClass(new ClassInfo<>(Member.class, "discordmember")
-                .user("discordmember?s?")
-                .name("Discord Member")
-                .description("A Member object.")
-                .since("1.0"));
-
-        Classes.registerClass(new ClassInfo<>(Guild.class, "discordguild")
-                .user("discordguild?s?")
-                .name("Discord Guild")
-                .description("A Guild object.")
-                .since("1.0"));
-
-        Classes.registerClass(new ClassInfo<>(MessageChannel.class, "discordchannel")
-                .user("discordchannel?s?")
-                .name("Discord Channel")
-                .description("A MessageChannel object.")
-                .since("1.0"));
-
-        Classes.registerClass(new ClassInfo<>(GatewayIntent.class, "discordintent")
-                .user("discordintent?s?")
-                .name("Discord Intent")
-                .description("A Discord Gateway Intent")
-                .since("1.0")
-                .parser(new Parser<GatewayIntent>() {
-                    @Override
-                    public GatewayIntent parse(String s, ParseContext context) {
-                        return Utils.getGatewaySafely(s.replace(" ", "_").toUpperCase());
-                    }
-
-                    @Override
-                    public String toString(GatewayIntent o, int flags) {
-                        return o.toString().toLowerCase().replace("_", " ");
-                    }
-
-                    @Override
-                    public String toVariableNameString(GatewayIntent o) {
-                        return o.toString().toLowerCase().replace("_", " ");
-                    }
-
-                    @Override
-                    public String getVariableNamePattern() {
-                        return "[a-z ]+";
-                    }
-                }));
-
-        Converters.registerConverter(DiscordMessage.class, String.class, DiscordMessage::getMessage);
-        // Below will not work until issue #4272 is addressed.
-        Converters.registerConverter(String.class, DiscordMessage.class, DiscordMessage::new);
-        Converters.registerConverter(DiscordBot.class, String.class, DiscordBot::toString);
-        Converters.registerConverter(Member.class, User.class, Member::getUser);
-        Converters.registerConverter(Member.class, String.class, Member::getEffectiveName);
-        Converters.registerConverter(User.class, String.class, User::getName);
-        Converters.registerConverter(Message.class, String.class, Message::getContentRaw);
-    }
+	private void registerElements() {
+		if (Skript.isAcceptRegistrations()) {
+			try {
+				addon.loadClasses("com.ankoki.skriptdiscord.elements");
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
 }

@@ -1,9 +1,8 @@
 main: com.ankoki.skriptdiscord.SkriptDiscord
 name: skript-discord
-version: 1.0
+version: 1.0-ALPHA
 author: Ankoki
 website: 'https://www.github.com/Ankoki-Dev/skript-discord'
 description: §7skript-discord §fis used to provide discord implementation to Skript.
-api-version: 1.13
-depend:
+softdepend:
   - Skript
