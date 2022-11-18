@@ -18,7 +18,7 @@ public class SecEmbed extends Section {
 
 	static {
 		Skript.registerSection(SecEmbed.class,
-				"create [a[n]] embed");
+				"(create|make) [a[n]] embed");
 	}
 
 	private String title, description, author;

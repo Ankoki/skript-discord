@@ -37,7 +37,7 @@ public class StructBot extends Structure {
 						.addEntry("token", null, false)
 						.addEntryData(new ExpressionEntryData<>("permissions", null, true, String.class, ContextlessEvent.class))
 						.build(),
-				"register [a] [new] [discord] bot");
+				"(register|login to) [a] [new] [discord] bot");
 	}
 
 	private DiscordBot currentBot;

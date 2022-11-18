@@ -17,7 +17,7 @@ public class SecExprField extends SectionExpression<Field, SecEmbed> {
 	static {
 		Skript.registerExpression(SecExprField.class, Field.class, ExpressionType.SIMPLE,
 				"[the] [current] fields",
-				"[:inline] field named %string% with value %strings%");
+				"[:inline] field (name|title)d %string% with content %strings%");
 	}
 
 	private Expression<String> nameExpr, valueExpr;
@@ -81,7 +81,7 @@ public class SecExprField extends SectionExpression<Field, SecEmbed> {
 	@Override
 	public String toString(Event event, boolean b) {
 		return isCreation ? (isInline ? "inline " : "") + "field named " + nameExpr.toString(event, b) +
-				" with value " + valueExpr.toString(event, b) :
+				" with content " + valueExpr.toString(event, b) :
 				"the current fields";
 	}
 

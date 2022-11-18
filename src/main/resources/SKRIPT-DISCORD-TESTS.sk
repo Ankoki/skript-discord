@@ -1,0 +1,21 @@
+# BASIC BOT CREATION TEST
+create discord bot:
+    name: skript-bot
+    prefix: :
+    token: {@discord-developer-token}
+
+# BASIC COMMAND TEST
+discord command "TEST:ECHO":
+    bots: skript-bot
+    trigger:
+        reply to event-message with contents of event-message
+
+# EMBED TEST
+discord command "TEST:EMBED"
+    bots: skript-bot
+    trigger:
+        make embed:
+            set title to "Hello!"
+            add inline field titled "**INLINE**" with content "This is an example of an inline field."
+            add inline field titled "**INLINE**" with content "Here's another!"
+            add field titled "**NOT INLINE**" with content "And this is a non inlined field:p"
