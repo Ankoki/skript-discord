@@ -1,9 +1,9 @@
-package com.ankoki.skriptdiscord.elements.sections.expressions;
+package com.ankoki.skriptdiscord.elements.sections.embed.expressions;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.lang.ExpressionType;
-import com.ankoki.skriptdiscord.elements.sections.SecEmbed;
+import com.ankoki.skriptdiscord.elements.sections.embed.SecEmbed;
 import com.ankoki.skriptdiscord.misc.skript.SectionExpression;
 import org.bukkit.event.Event;
 

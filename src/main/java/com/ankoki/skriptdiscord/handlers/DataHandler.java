@@ -15,6 +15,7 @@ public class DataHandler {
 
 	/**
 	 * Registers a discord bot. This will also log into it.
+	 *
 	 * @param token the token to log into the bot with.
 	 * @return true if successful, false if another bot already has this name.
 	 */
@@ -39,6 +40,7 @@ public class DataHandler {
 
 	/**
 	 * Gets a discord bot by name. Might be null.
+	 *
 	 * @param name the name of the bot.
 	 * @return the discord bot with this name, or null.
 	 */
@@ -49,6 +51,7 @@ public class DataHandler {
 
 	/**
 	 * Gets a discord bot by its JDA instance. Might be null.
+	 *
 	 * @param jda the jda instance to search for.
 	 * @return the discord bot with this JDA instance, or null.
 	 */
@@ -62,9 +65,11 @@ public class DataHandler {
 
 	/**
 	 * Unregisters a bot.
+	 *
 	 * @param bot the bot to unregister.
 	 */
 	public static void unregisterBot(DiscordBot bot) {
 		DISCORD_BOTS.remove(bot.getName());
 	}
+
 }

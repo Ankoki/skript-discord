@@ -10,6 +10,7 @@ public class Misc {
 
 	/**
 	 * Checks if plugins are enabled.
+	 *
 	 * @param plugins the name of the plugins.
 	 * @return if all plugins are enabled.
 	 */
@@ -24,9 +25,10 @@ public class Misc {
 
 	/**
 	 * Checks if an array contains a value.
+	 *
 	 * @param haystack the array to check.
-	 * @param needle the value to find.
-	 * @param <Type> the class type.
+	 * @param needle   the value to find.
+	 * @param <Type>   the class type.
 	 * @return true if the array contains the value.
 	 */
 	public static <Type> boolean arrayContains(Type[] haystack, Type needle) {
@@ -40,9 +42,10 @@ public class Misc {
 	/**
 	 * Gets an enum value safely which returns null if not found. Whitespace and lowercase letters will be converted to
 	 * uppercase and _.
+	 *
 	 * @param type the class of the enum.
 	 * @param name the name of the value to look for.
-	 * @param <E> the class which extends enum to get the value for.
+	 * @param <E>  the class which extends enum to get the value for.
 	 * @return the found value, or null.
 	 */
 	public static <E extends Enum<E>> E safeValueOf(Class<E> type, String name) {
@@ -55,9 +58,10 @@ public class Misc {
 
 	/**
 	 * Maps a string list of enum names to the respective enums, not containing null.
-	 * @param type the enum class.
+	 *
+	 * @param type   the enum class.
 	 * @param values the string values to map.
-	 * @param <E> the class which extends enum to map the values to.
+	 * @param <E>    the class which extends enum to map the values to.
 	 * @return the mapped values.
 	 */
 	@SuppressWarnings("unchecked")
@@ -66,6 +70,55 @@ public class Misc {
 				.map(value -> Misc.safeValueOf(type, value))
 				.filter(Objects::nonNull)
 				.toArray();
+	}
+
+
+	/**
+	 * Checks if a text is safe to use for the given TextType. See {@link net.dv8tion.jda.api.entities.MessageEmbed.Field} for more information.
+	 *
+	 * @param text the text to check.
+	 * @param type the type to check against.
+	 * @return true if safe.
+	 */
+	public static boolean isDiscordSafe(String text, TextType type) {
+		if (text == null)
+			return false;
+		return type.isSafe(text);
+	}
+
+	/**
+	 * Utility enum to make sure strings are safe from exceptions.
+	 */
+	public enum TextType {
+		TITLE(256),
+		AUTHOR(256),
+		VALUE(1024),
+		DESCRIPTION(4096),
+		FOOTER(2048),
+		URL(2000),
+		EMBED(6000);
+
+		private final int maxLength;
+
+		/**
+		 * Defines the max length of a text for the given type.
+		 *
+		 * @param maxLength the max length.
+		 */
+		TextType(int maxLength) {
+			this.maxLength = maxLength;
+		}
+
+		/**
+		 * Checks if the given text is applicable for the type.
+		 *
+		 * @param text the text to check.
+		 * @return true if it is.
+		 */
+		public boolean isSafe(String text) {
+			return text.length() <= maxLength;
+		}
+
 	}
 
 }

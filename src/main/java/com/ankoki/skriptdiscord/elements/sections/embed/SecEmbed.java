@@ -1,4 +1,4 @@
-package com.ankoki.skriptdiscord.elements.sections;
+package com.ankoki.skriptdiscord.elements.sections.embed;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.config.SectionNode;
@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.bukkit.event.Event;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SecEmbed extends Section {
@@ -21,7 +22,7 @@ public class SecEmbed extends Section {
 	}
 
 	private String title, description, author;
-	private List<MessageEmbed.Field> fields;
+	private final List<MessageEmbed.Field> fields = new ArrayList<>();
 
 	@Override
 	public boolean init(Expression<?>[] expressions, int i, Kleenean kleenean, ParseResult parseResult, SectionNode sectionNode, List<TriggerItem> list) {
@@ -98,6 +99,24 @@ public class SecEmbed extends Section {
 	 */
 	public void setAuthor(String author) {
 		this.author = author;
+	}
+
+	/**
+	 * Gets the fields of the current embed.
+	 *
+	 * @return the fields.
+	 */
+	public List<MessageEmbed.Field> getFields() {
+		return fields;
+	}
+
+	/**
+	 * Adds a new field to the current embed.
+	 *
+	 * @param field the new field.
+	 */
+	public void addField(MessageEmbed.Field field) {
+		this.fields.add(field);
 	}
 
 }
