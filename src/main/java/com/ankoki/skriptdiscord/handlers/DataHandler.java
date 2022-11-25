@@ -1,6 +1,7 @@
 package com.ankoki.skriptdiscord.handlers;
 
 import com.ankoki.skriptdiscord.discord.DiscordBot;
+import com.ankoki.skriptdiscord.discord.events.DiscordAdapter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +25,7 @@ public class DataHandler {
 			return false;
 		else {
 			JDA jda = JDABuilder.createDefault(token).build();
+			jda.addEventListener(new DiscordAdapter(bot));
 			CompletableFuture.runAsync(() -> {
 				try {
 					jda.awaitReady();
@@ -61,6 +63,15 @@ public class DataHandler {
 			if (bot.getJDA() == jda)
 				return bot;
 		return null;
+	}
+
+	/**
+	 * Gets all registered discord bots.
+	 *
+	 * @return all the registered bots.
+	 */
+	public static DiscordBot[] getBots() {
+		return DISCORD_BOTS.values().toArray(new DiscordBot[0]);
 	}
 
 	/**

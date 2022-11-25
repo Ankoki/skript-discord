@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import org.bukkit.event.Cancellable;
 
-public class BotMessageEvent extends BotEvent implements Cancellable {
+public class MessageEvent extends BotEvent implements Cancellable {
 
 	private boolean cancelled;
 	private Member member;
@@ -20,7 +20,7 @@ public class BotMessageEvent extends BotEvent implements Cancellable {
 	 *
 	 * @param bot the bot to use in this event.
 	 */
-	public BotMessageEvent(DiscordBot bot, Member member, Message message, Guild guild, Channel channel) {
+	public MessageEvent(DiscordBot bot, Member member, Message message, Guild guild, Channel channel) {
 		super(bot);
 	}
 
@@ -33,4 +33,5 @@ public class BotMessageEvent extends BotEvent implements Cancellable {
 	public void setCancelled(boolean cancel) {
 		this.cancelled = cancel;
 	}
+
 }

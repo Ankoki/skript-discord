@@ -1,6 +1,7 @@
 package com.ankoki.skriptdiscord.elements.structures;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -9,7 +10,9 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.ContextlessEvent;
-import com.ankoki.skriptdiscord.discord.events.bukkit.DiscordCommandEvent;
+import com.ankoki.skriptdiscord.discord.DiscordBot;
+import com.ankoki.skriptdiscord.discord.events.bukkit.MessageCommandEvent;
+import com.ankoki.skriptdiscord.handlers.DataHandler;
 import org.bukkit.event.Event;
 import org.skriptlang.skript.lang.entry.EntryContainer;
 import org.skriptlang.skript.lang.entry.EntryValidator;
@@ -22,7 +25,7 @@ import org.skriptlang.skript.lang.structure.Structure;
 @Examples("""
   discord command "echo":
   		bots: ByeolBot
-  		
+  		arguments: strings
   		trigger:
   			reply to event-message with ""
 		""")
@@ -32,9 +35,9 @@ public class StructCommand extends Structure {
 	static {
 		Skript.registerStructure(StructCommand.class,
 				EntryValidator.builder()
-						.addEntry("bots", null, false)
-						.addEntryData(new ExpressionEntryData<>("arguments", null, true, Expression.class, ContextlessEvent.class))
-						.addEntryData(new TriggerEntryData("trigger", null, false, DiscordCommandEvent.class))
+						.addEntryData(new ExpressionEntryData<>("bots", null, false, String.class, ContextlessEvent.class))
+						.addEntryData(new ExpressionEntryData<>("arguments", null, true, ClassInfo.class, ContextlessEvent.class))
+						.addEntryData(new TriggerEntryData("trigger", null, false, MessageCommandEvent.class)) // CommandEvent pls.
 						.build(),
 				"discord [:slash] command %string%");
 	}
@@ -51,7 +54,17 @@ public class StructCommand extends Structure {
 
 	@Override
 	public boolean load() {
-		return false;
+		EntryContainer container = this.getEntryContainer();
+		String[] bots = (String[]) container.get("bots", Expression.class, false).getAll(ContextlessEvent.get());
+		boolean botAlive = false;
+		for (String name : bots) {
+			DiscordBot bot = DataHandler.getBot(name);
+			if (bot != null) {
+				botAlive = true;
+
+			}
+		}
+		return botAlive;
 	}
 
 	@Override
@@ -63,4 +76,5 @@ public class StructCommand extends Structure {
 	public String toString(Event event, boolean b) {
 		return "discord command " + name;
 	}
+
 }

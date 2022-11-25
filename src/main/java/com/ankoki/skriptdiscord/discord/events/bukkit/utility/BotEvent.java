@@ -12,6 +12,7 @@ public class BotEvent extends Event {
 
 	/**
 	 * Creates a new bot event.
+	 *
 	 * @param bot the bot to use in this event.
 	 */
 	public BotEvent(DiscordBot bot) {
@@ -19,7 +20,8 @@ public class BotEvent extends Event {
 	}
 
 	/**
-	 * Gets the bot used in this event.
+	 * Gets the bot used in/that heard this event.
+	 *
 	 * @return the bot used in this event.
 	 */
 	public DiscordBot getBot() {
@@ -34,9 +36,11 @@ public class BotEvent extends Event {
 
 	/**
 	 * REQUIRED BY BUKKIT.
+	 *
 	 * @return empty handler list.
 	 */
 	public static HandlerList getHandlerList() {
 		return HANDLER_LIST;
 	}
+
 }

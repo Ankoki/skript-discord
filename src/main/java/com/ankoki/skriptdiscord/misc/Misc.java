@@ -1,7 +1,11 @@
 package com.ankoki.skriptdiscord.misc;
 
+import com.ankoki.skriptdiscord.discord.DiscordBot;
+import com.ankoki.skriptdiscord.handlers.DataHandler;
+import net.dv8tion.jda.api.entities.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -119,6 +123,20 @@ public class Misc {
 			return text.length() <= maxLength;
 		}
 
+	}
+
+	/**
+	 * Checks if the given message is a command.
+	 *
+	 * @param message the message to check.
+	 * @return the bot that owns this command, or null.
+	 */
+	@Nullable
+	public static DiscordBot isCommand(Message message) {
+		for (DiscordBot bot : DataHandler.getBots()) {
+
+		}
+		return null;
 	}
 
 }
