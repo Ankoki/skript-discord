@@ -23,8 +23,6 @@ dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT'
     compileOnly files('Skript.jar')
     implementation 'net.dv8tion:JDA:5.0.0-alpha.22'
-    compileOnly 'org.projectlombok:lombok:1.18.24'
-    annotationProcessor 'org.projectlombok:lombok:1.18.24'
 }
 
 test {
@@ -33,7 +31,6 @@ test {
 
 shadowJar {
     ant.replace(file: 'src/main/resources/plugin.yml', token: '@VERSION@', value: this.version)
-    relocate 'lombok', 'com.ankoki.skriptdiscord.libs.lombok'
     relocate 'net.dv8tion.jda', 'com.ankoki.skriptdiscord.libs.jda'
     archiveName 'skript-discord.jar'
 }
