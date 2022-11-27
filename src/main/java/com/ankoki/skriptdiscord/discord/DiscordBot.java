@@ -1,6 +1,6 @@
 package com.ankoki.skriptdiscord.discord;
 
-import com.ankoki.skriptdiscord.handlers.CommandHandler;
+import com.ankoki.skriptdiscord.handlers.ChatCommands;
 import com.ankoki.skriptdiscord.handlers.DataHandler;
 import com.ankoki.skriptdiscord.misc.Misc;
 import net.dv8tion.jda.api.JDA;
@@ -12,7 +12,7 @@ public class DiscordBot {
 	private final String name,
 			prefix;
 	private final Permission[] permissions;
-	private final CommandHandler commandHandler = new CommandHandler(this);
+	private final ChatCommands commandHandler = new ChatCommands(this);
 	private final boolean setup;
 
 	// Local Fields
@@ -113,7 +113,7 @@ public class DiscordBot {
 	 *
 	 * @return the current command handler.
 	 */
-	public CommandHandler getCommandHandler() {
+	public ChatCommands getCommandHandler() {
 		return commandHandler;
 	}
 

@@ -1,4 +1,4 @@
-package com.ankoki.skriptdiscord.discord.events.bukkit.utility;
+package com.ankoki.skriptdiscord.discord.events.bukkit;
 
 import com.ankoki.skriptdiscord.discord.DiscordBot;
 import org.bukkit.event.Event;

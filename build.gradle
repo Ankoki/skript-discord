@@ -21,7 +21,7 @@ repositories {
 dependencies {
     compileOnly 'org.jetbrains:annotations:23.0.0'
     compileOnly 'org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT'
-    compileOnly files('SKRIPT-STRUCTURES.jar')
+    compileOnly files('Skript.jar')
     implementation 'net.dv8tion:JDA:5.0.0-alpha.22'
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'

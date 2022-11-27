@@ -1,10 +1,15 @@
 package com.ankoki.skriptdiscord.misc;
 
+import ch.njol.skript.Skript;
+import ch.njol.skript.classes.ClassInfo;
 import com.ankoki.skriptdiscord.discord.DiscordBot;
+import com.ankoki.skriptdiscord.handlers.ChatCommands;
 import com.ankoki.skriptdiscord.handlers.DataHandler;
 import net.dv8tion.jda.api.entities.Message;
 import org.bukkit.Bukkit;
+import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -76,7 +81,6 @@ public class Misc {
 				.toArray();
 	}
 
-
 	/**
 	 * Checks if a text is safe to use for the given TextType. See {@link net.dv8tion.jda.api.entities.MessageEmbed.Field} for more information.
 	 *
@@ -129,14 +133,52 @@ public class Misc {
 	 * Checks if the given message is a command.
 	 *
 	 * @param message the message to check.
-	 * @return the bot that owns this command, or null.
+	 * @return the command, or null.
 	 */
 	@Nullable
-	public static DiscordBot isCommand(Message message) {
+	public static ChatCommands.Command isCommand(Message message) {
 		for (DiscordBot bot : DataHandler.getBots()) {
-
+			if (bot.getCommandHandler().hasCommand(message.getContentRaw()))
+				return bot.getCommandHandler().getCommand(message.getContentRaw());
 		}
 		return null;
+	}
+
+	/**
+	 * Gets the arguments of a command
+	 *
+	 * @param message
+	 * @return
+	 */
+	public static String[] getArguments(@NotNull DiscordBot bot, @NotNull Message message) {
+		String content = message.getContentRaw();
+		bot.getPrefix();
+	}
+
+	/**
+	 * Checks if a string is null or empty.
+	 *
+	 * @param string the string to check.
+	 * @return true if the string is null or empty.
+	 */
+	public static boolean isNullOrEmpty(String string) {
+		return string == null || string.isEmpty();
+	}
+
+	/**
+	 * Checks if the given class infos are all safe to use (can parse text). If not, an error is produced.
+	 *
+	 * @param classInfos the class infos to check.
+	 * @return true if safe, false if not and errors are produced.
+	 */
+	public static boolean checkArguments(ClassInfo<?>... classInfos) {
+		for (ClassInfo<?> classInfo : classInfos) {
+			if (!ChatCommands.Arguments.validateClassInfo(classInfo)) {
+				Skript.error("You cannot use the class info '" + classInfo.getCodeName() + "', as it doesn't have a parser.");
+				return false;
+			}
+		}
+		return true;
 	}
 
 }
