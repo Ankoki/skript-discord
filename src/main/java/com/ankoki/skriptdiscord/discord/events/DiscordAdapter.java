@@ -3,6 +3,10 @@ package com.ankoki.skriptdiscord.discord.events;
 import com.ankoki.skriptdiscord.discord.DiscordBot;
 import com.ankoki.skriptdiscord.discord.events.bukkit.commands.MessageCommandEvent;
 import com.ankoki.skriptdiscord.discord.events.bukkit.messages.*;
+import com.ankoki.skriptdiscord.discord.events.bukkit.messages.guild.GuildMessageEvent;
+import com.ankoki.skriptdiscord.discord.events.bukkit.messages.guild.NewsMessageEvent;
+import com.ankoki.skriptdiscord.discord.events.bukkit.messages.guild.ThreadMessageEvent;
+import com.ankoki.skriptdiscord.discord.events.bukkit.messages.guild.VoiceMessageEvent;
 import com.ankoki.skriptdiscord.handlers.ChatCommands;
 import com.ankoki.skriptdiscord.misc.Misc;
 import net.dv8tion.jda.api.entities.Member;
@@ -48,7 +52,7 @@ public class DiscordAdapter extends ListenerAdapter {
 		MessageChannel channel = event.getChannel();
 		ChatCommands.Command command = Misc.isCommand(message);
 		if (command != null) {
-			MessageCommandEvent commandEvent = new MessageCommandEvent(command.getBot(), user, channel, Misc.getArguments(command.getBot(), message));
+			MessageCommandEvent commandEvent = new MessageCommandEvent(command.getBot(), user, channel, Misc.getArguments(message));
 			Bukkit.getPluginManager().callEvent(commandEvent);
 			if (!commandEvent.isCancelled())
 				command.execute(commandEvent, commandEvent.getArguments());

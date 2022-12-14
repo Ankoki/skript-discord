@@ -1,6 +1,7 @@
-package com.ankoki.skriptdiscord.discord.events.bukkit.messages;
+package com.ankoki.skriptdiscord.discord.events.bukkit.messages.guild;
 
 import com.ankoki.skriptdiscord.discord.DiscordBot;
+import com.ankoki.skriptdiscord.discord.events.bukkit.messages.MessageEvent;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -30,7 +31,7 @@ public class GuildMessageEvent extends MessageEvent {
 	public Member getMember() {
 		return member;
 	}
-	
+
 	@Override
 	public GuildMessageChannel getChannel() {
 		return (GuildMessageChannel) super.getChannel();

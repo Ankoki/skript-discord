@@ -1,4 +1,4 @@
-package com.ankoki.skriptdiscord.discord.events.bukkit.messages;
+package com.ankoki.skriptdiscord.discord.events.bukkit.messages.guild;
 
 import com.ankoki.skriptdiscord.discord.DiscordBot;
 import net.dv8tion.jda.api.entities.Member;

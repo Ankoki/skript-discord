@@ -47,7 +47,7 @@ public class ChatCommands {
 	public boolean registerCommand(Trigger trigger, String command, Argument... arguments) {
 		if (commands.containsKey(command))
 			return false;
-		commands.put(command, new Command(new Arguments(arguments), trigger));
+		commands.put(command, new Command(this.getBot(), new Arguments(arguments), trigger));
 		return true;
 	}
 
@@ -90,6 +90,7 @@ public class ChatCommands {
 
 	/**
 	 * Checks if a command exists/is registered from a raw message.
+	 * Can be a full message or just the command name.
 	 *
 	 * @param string the message.
 	 * @return true if the command exists.

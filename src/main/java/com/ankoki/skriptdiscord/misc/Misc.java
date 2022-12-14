@@ -7,7 +7,6 @@ import com.ankoki.skriptdiscord.handlers.ChatCommands;
 import com.ankoki.skriptdiscord.handlers.DataHandler;
 import net.dv8tion.jda.api.entities.Message;
 import org.bukkit.Bukkit;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -145,14 +144,19 @@ public class Misc {
 	}
 
 	/**
-	 * Gets the arguments of a command
+	 * Gets the raw arguments of a command from a message.
 	 *
-	 * @param message
-	 * @return
+	 * @param message the message to get the arguments from.
+	 * @return the arguments.
 	 */
-	public static String[] getArguments(@NotNull DiscordBot bot, @NotNull Message message) {
+	public static String[] getArguments(@NotNull Message message) {
 		String content = message.getContentRaw();
-		bot.getPrefix();
+		if (Misc.isNullOrEmpty(content))
+			return new String[0];
+		String[] split = content.split(" ");
+		String[] other = new String[split.length - 1];
+		System.arraycopy(split, 1, other, split.length, other.length);
+		return other;
 	}
 
 	/**
